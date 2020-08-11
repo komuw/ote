@@ -48,7 +48,7 @@ require (
 )
 ```
 and turns it into a `go.mod` file like;
-```go
+```bash
 module github.com/pkg/myPkg
 
 require (
