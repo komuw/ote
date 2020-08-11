@@ -51,6 +51,4 @@ func setTest(line *modfile.Line) {
 
 	// Insert at beginning of existing comment.
 	com.Token = "// test; " + text
-	return
-
 }

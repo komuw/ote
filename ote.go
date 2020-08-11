@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -170,7 +171,7 @@ func getTestDeps(impPaths []string, allDeps []modfile.Require) []modfile.Require
 	return testRequires
 }
 
-func updateMod(testRequires []modfile.Require, f *modfile.File) error {
+func updateMod(testRequires []modfile.Require, f *modfile.File, readonly bool) error {
 	notIndirect := []modfile.Require{}
 	for _, v := range testRequires {
 		// we do not want to add a `//test` comment to any requires that allready have `//indirect` comment
@@ -200,41 +201,58 @@ func updateMod(testRequires []modfile.Require, f *modfile.File) error {
 		return err
 	}
 
-	fi, err := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
-	if err != nil {
+	if readonly {
+		fmt.Println(string(b))
+	} else {
+		fi, err := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
+		if err != nil {
+			return err
+		}
+		_, err = fi.Write(b)
+		fmt.Println("successfully updated go.mod file.")
 		return err
 	}
 
-	_, err = fi.Write(b)
-
-	return err
+	return nil
 }
 
 func main() {
-	f, err := getModFile()
+	var r bool
+	flag.BoolVar(
+		&r,
+		"r",
+		false,
+		"readonly; display how the updated go.mod file would look like, without actually making those changes.")
+	flag.Parse()
+
+	err := run(r)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
 
+func run(readonly bool) error {
+	f, err := getModFile()
+	if err != nil {
+		return err
+	}
 	thisMod := f.Module.Mod.Path
 
 	modulePaths, err := getModules(thisMod)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	fmt.Println("modulePaths:\n", modulePaths)
 
 	allDeps, err := getDeps(thisMod)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	fmt.Println("allDeps: ", allDeps)
 
 	testRequires := getTestDeps(modulePaths, allDeps)
-	fmt.Println("testRequires: ", testRequires)
-
-	err = updateMod(testRequires, f)
+	err = updateMod(testRequires, f, readonly)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 }
