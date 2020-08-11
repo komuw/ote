@@ -37,8 +37,6 @@ Usage of ote:
 ```bash
 module github.com/pkg/myPkg
 
-go 1.14
-
 require (
 	github.com/Shopify/sarama v1.26.4
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -52,8 +50,6 @@ require (
 and turns it into a `go.mod` file like;
 ```bash
 module github.com/pkg/myPkg
-
-go 1.14
 
 require (
 	github.com/Shopify/sarama v1.26.4
