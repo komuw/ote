@@ -4,4 +4,6 @@ Most recent version is listed first.
 
 
 ## v0.0.1
-- TODO
+- Add CLI: https://github.com/komuw/ote/pull/1
+- Add documentation: https://github.com/komuw/ote/pull/2
+
