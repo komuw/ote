@@ -39,7 +39,7 @@ jobs:
               echo $ChangedFiles
               case "$ChangedFiles" in
                 *CHANGELOG.*)
-                    printf "\n Thanks, your commits include update to release notes. \n";;
+                    printf "\n Thanks, your commits include updates to release notes. \n";;
                 *)
                     printf '\n You should add release notes to CHANGELOG.md \n' && exit 77;;
               esac
