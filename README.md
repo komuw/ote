@@ -33,6 +33,38 @@ Usage of ote:
 		(readonly) display how the updated go.mod file would look like, without actually updating the file.
 ```
 
+`ote` takes a `go.mod` file like;
+```bash
+module github.com/pkg/myPkg
+
+go 1.14
+
+require (
+	github.com/Shopify/sarama v1.26.4
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/google/go-cmp v0.5.0
+	github.com/nats-io/nats-server/v2 v2.1.7 // indirect
+	github.com/nats-io/nats.go v1.10.0
+	github.com/stretchr/testify v1.6.1 // priorComment
+	golang.org/x/mod v0.3.0
+)
+```
+and turns it into a `go.mod` file like;
+```bash
+module github.com/pkg/myPkg
+
+go 1.14
+
+require (
+	github.com/Shopify/sarama v1.26.4
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/google/go-cmp v0.5.0 // test
+	github.com/nats-io/nats-server/v2 v2.1.7 // indirect
+	github.com/nats-io/nats.go v1.10.0
+	github.com/stretchr/testify v1.6.1 // test; priorComment
+	golang.org/x/mod v0.3.0
+)
+```
 
 ## How it works  
 1. read `go.mod` file.
