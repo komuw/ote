@@ -82,3 +82,10 @@ func TestGetTestDeps(t *testing.T) {
 
 	_ = getTestDeps(modulePaths, allDeps)
 }
+
+func TestRun(t *testing.T) {
+
+	p := "testdata/mod1"
+	_ = p
+
+}

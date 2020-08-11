@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"golang.org/x/mod/modfile"
@@ -55,9 +56,7 @@ const goarchList = `386
 					wasm `
 const cGo = "cgo"
 
-const gomodFile = "go.mod"
-
-func getModFile() (*modfile.File, error) {
+func getModFile(gomodFile string) (*modfile.File, error) {
 	modContents, err := ioutil.ReadFile(gomodFile)
 	if err != nil {
 		return nil, err
@@ -70,7 +69,7 @@ func getModFile() (*modfile.File, error) {
 	return f, nil
 }
 
-func getPackage(pattern string, mainModule bool) (*packages.Package, error) {
+func getPackage(pattern string, gomodFile string, mainModule bool) (*packages.Package, error) {
 	patterns := []string{fmt.Sprintf("pattern=%s", pattern)}
 	buildFlags := (strings.Join(strings.Split(goosList, " "), ",") +
 		strings.Join(strings.Split(goarchList, " "), ",") +
@@ -84,6 +83,7 @@ func getPackage(pattern string, mainModule bool) (*packages.Package, error) {
 		Mode:       pkgNeeds,
 		Tests:      false,
 		BuildFlags: []string{fmt.Sprintf("-tags=%s", buildFlags)},
+		Dir:        filepath.Dir(gomodFile),
 	}
 	pkgs, err := packages.Load(cfg, patterns...)
 	if err != nil {
@@ -95,10 +95,10 @@ func getPackage(pattern string, mainModule bool) (*packages.Package, error) {
 }
 
 // getModules finds all the modules that have been used/imported by a module
-func getModules(pattern string) ([]string, error) {
+func getModules(pattern string, gomodFile string) ([]string, error) {
 	modulePaths := []string{}
 
-	mainPkg, err := getPackage(pattern, true)
+	mainPkg, err := getPackage(pattern, gomodFile, true)
 	if err != nil {
 		return modulePaths, err
 	}
@@ -108,7 +108,7 @@ func getModules(pattern string) ([]string, error) {
 	}
 
 	for _, v := range impPaths {
-		pkg, err := getPackage(v, false)
+		pkg, err := getPackage(v, gomodFile, false)
 		if err != nil {
 			// maybe we should continue, instead of returning?
 			return modulePaths, err
@@ -127,7 +127,7 @@ func getModules(pattern string) ([]string, error) {
 }
 
 // getDeps finds all the dependencies of a given module
-func getDeps(p string) ([]modfile.Require, error) {
+func getDeps(gomodFile string) ([]modfile.Require, error) {
 	requires := []modfile.Require{}
 
 	modContents, err := ioutil.ReadFile(gomodFile)
@@ -171,7 +171,7 @@ func getTestDeps(impPaths []string, allDeps []modfile.Require) []modfile.Require
 	return testRequires
 }
 
-func updateMod(testRequires []modfile.Require, f *modfile.File, readonly bool) error {
+func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string, readonly bool) error {
 	notIndirect := []modfile.Require{}
 	for _, v := range testRequires {
 		// we do not want to add a `//test` comment to any requires that allready have `//indirect` comment
@@ -218,48 +218,67 @@ func updateMod(testRequires []modfile.Require, f *modfile.File, readonly bool) e
 
 func main() {
 	var r bool
+	var f string
+
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(),
 			`Usage of ote:
-	ote .
-		update go.mod file with a comment next to all dependencies that are test dependencies.
-	ote -r .
-		(readonly) display how the updated go.mod file would look like, without actually updating the file.
+-f string
+	path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
+-r	(readonly) display how the updated go.mod file would look like, without actually updating the file.
 
-`)
+examples:
+	ote .
+		update go.mod in the current directory
+	ote -f /tmp/myPkg
+		update go.mod in the /tmp/myPkg directory
+
+	ote -r
+		display how go.mod in the current directory would be updated without actually updating it.
+	ote -f /tmp/myPkg -r
+	    display how go.mod in the /tmp/myPkg directory would be updated without actually updating it.
+
+	`)
 	}
 	flag.BoolVar(
 		&r,
 		"r",
 		false,
 		"(readonly) display how the updated go.mod file would look like, without actually updating the file.")
+	flag.StringVar(
+		&f,
+		"f",
+		".",
+		"path to directory containing the go.mod file. By default, it uses the current directory.")
 	flag.Parse()
 
-	err := run(r)
+	err := run(f, r)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(readonly bool) error {
-	f, err := getModFile()
+func run(fp string, readonly bool) error {
+	gomodFile := filepath.Join(fp, "go.mod")
+
+	f, err := getModFile(gomodFile)
 	if err != nil {
 		return err
 	}
 	thisMod := f.Module.Mod.Path
 
-	modulePaths, err := getModules(thisMod)
+	modulePaths, err := getModules(thisMod, gomodFile)
 	if err != nil {
 		return err
 	}
 
-	allDeps, err := getDeps(thisMod)
+	allDeps, err := getDeps(gomodFile)
 	if err != nil {
 		return err
 	}
 
 	testRequires := getTestDeps(modulePaths, allDeps)
-	err = updateMod(testRequires, f, readonly)
+	err = updateMod(testRequires, f, gomodFile, readonly)
 	if err != nil {
 		return err
 	}
