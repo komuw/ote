@@ -38,13 +38,12 @@ jobs:
               ChangedFiles=`git diff --name-only origin/master`
               echo $ChangedFiles
               case "$ChangedFiles" in
-                *RELEASE_NOTES.*)
+                *CHANGELOG.*)
                     printf "\n Thanks, your commits include update to release notes. \n";;
                 *)
-                    printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
+                    printf '\n You should add release notes to CHANGELOG.md \n' && exit 77;;
               esac
           fi
-
 
   run_tests:
     name: run_tests
