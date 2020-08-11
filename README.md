@@ -20,15 +20,59 @@ Comprehensive documetion is available -> [Documentation](https://pkg.go.dev/gith
 ## Installation
 
 ```shell
-TODO: add here
+go get github.com/komuw/ote
 ```           
 
 
 ## Usage
-```go
-TODO: add here
+```bash
+Usage of ote:
+	ote .
+		update go.mod file with a comment next to all dependencies that are test dependencies.
+	ote -r .
+		(readonly) display how the updated go.mod file would look like, without actually updating the file.
 ```
 
+`ote` takes a `go.mod` file like;
+```bash
+module github.com/pkg/myPkg
+
+require (
+	github.com/Shopify/sarama v1.26.4
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/google/go-cmp v0.5.0
+	github.com/nats-io/nats-server/v2 v2.1.7 // indirect
+	github.com/nats-io/nats.go v1.10.0
+	github.com/stretchr/testify v1.6.1 // priorComment
+	golang.org/x/mod v0.3.0
+)
+```
+and turns it into a `go.mod` file like;
+```bash
+module github.com/pkg/myPkg
+
+require (
+	github.com/Shopify/sarama v1.26.4
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/google/go-cmp v0.5.0 // test
+	github.com/nats-io/nats-server/v2 v2.1.7 // indirect
+	github.com/nats-io/nats.go v1.10.0
+	github.com/stretchr/testify v1.6.1 // test; priorComment
+	golang.org/x/mod v0.3.0
+)
+```
 
 ## How it works  
-TODO   
+1. read `go.mod` file.
+2. get all the imports of all the files used by the package    
+  here we consider all the known build tags(`darwin`, `openbsd`, `riscv64` etc)    
+3. get all the modules of which all the imports belong to.    
+4. find all the modules declared in `go.mod` file.   
+5. find the difference in the modules between step 3 & 4.     
+   this difference represents the test dependencies.  
+6. update `go.mod` with a comment(`// test`) next to all the test dependencies.
+
+
+## Inspiration(Hat tip)
+1. [`x/mod`](https://pkg.go.dev/golang.org/x/mod).
+2. [`go/packages`](https://pkg.go.dev/golang.org/x/tools/go/packages).

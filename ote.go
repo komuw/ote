@@ -218,11 +218,21 @@ func updateMod(testRequires []modfile.Require, f *modfile.File, readonly bool) e
 
 func main() {
 	var r bool
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(),
+			`Usage of ote:
+	ote .
+		update go.mod file with a comment next to all dependencies that are test dependencies.
+	ote -r .
+		(readonly) display how the updated go.mod file would look like, without actually updating the file.
+
+`)
+	}
 	flag.BoolVar(
 		&r,
 		"r",
 		false,
-		"readonly; display how the updated go.mod file would look like, without actually making those changes.")
+		"(readonly) display how the updated go.mod file would look like, without actually updating the file.")
 	flag.Parse()
 
 	err := run(r)
