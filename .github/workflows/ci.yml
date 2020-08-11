@@ -1,0 +1,112 @@
+# DOCS: https://help.github.com/en/articles/workflow-syntax-for-github-actions
+
+name: ote ci
+on: [pull_request, push]
+
+jobs:
+
+
+  check_release_notes:
+    name: check_release_notes
+    timeout-minutes: 1
+    strategy:
+      matrix:
+        go-version: [1.14]
+        platform: [ubuntu-18.04]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: check if changes have release notes
+        if: github.ref != 'refs/heads/master'
+        env:
+          GIT_BRANCH: ${{ github.ref }}
+        run: |
+          if [ "$GIT_BRANCH" == "master" ]
+          then
+              printf "\n $GIT_BRANCH branch, ignoring check for relese notes \n"
+          elif [ "$GIT_BRANCH" == *"refs/tags/"* ]
+          then
+              printf "\n $GIT_BRANCH branch, ignoring check for relese notes \n"
+          else
+              ChangedFiles=`git diff --name-only origin/master`
+              echo $ChangedFiles
+              case "$ChangedFiles" in
+                *RELEASE_NOTES.*)
+                    printf "\n Thanks, your commits include update to release notes. \n";;
+                *)
+                    printf '\n You should add release notes to .github/RELEASE_NOTES.md \n' && exit 77;;
+              esac
+          fi
+
+
+  run_tests:
+    name: run_tests
+    timeout-minutes: 1
+    strategy:
+      matrix:
+        go-version: [1.14]
+        platform: [ubuntu-18.04, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: tests and benchmarks
+        run: |
+          go test -timeout 1m -race -run=XXXX -bench=. ./...
+          go test -timeout 1m -v -race -cover -coverprofile=coverage.out ./... && bash <(curl -s https://codecov.io/bash)
+          go tool cover -html=coverage.out -o coverage.html
+          go tool cover -func=coverage.out
+
+
+  run_analysis:
+    name: run_analysis
+    timeout-minutes: 1
+    strategy:
+      matrix:
+        go-version: [1.14]
+        platform: [ubuntu-18.04]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: install apt and pip deps
+        run: |
+          pwd; ls -lsha
+          sudo apt-get -y update
+          sudo apt -y install wget
+
+      - name: install tools
+        run: |
+          wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
+          mv /tmp/linux-amd64 /tmp/gobin
+          chmod +x /tmp/gobin
+          /tmp/gobin honnef.co/go/tools/cmd/staticcheck@$STATICCHECK_VERSION
+          /tmp/gobin github.com/securego/gosec/cmd/gosec
+        env:
+          GOBIN_VERSION: 'v0.0.11'
+          STATICCHECK_VERSION: '2020.1.4'
+
+      - name: static analysis
+        run: |
+          go vet -v -all ./...
+          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.14 -unused.whole-program ./...
+          gosec ./...
