@@ -1,19 +1,28 @@
 package main
 
 import (
+	"bytes"
+	"io/ioutil"
+	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
 
+var (
+	fp        = "testdata/mod1"
+	gomodFile = filepath.Join(fp, "go.mod")
+)
+
 func TestGetModFile(t *testing.T) {
-	f, err := getModFile()
+	f, err := getModFile(gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	mP := "github.com/komuw/ote"
+	mP := "my/mod1"
 	if !cmp.Equal(f.Module.Mod.Path, mP) {
 		t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", f.Module.Mod.Path, mP)
 	}
@@ -21,8 +30,8 @@ func TestGetModFile(t *testing.T) {
 }
 
 func TestGetPackage(t *testing.T) {
-	mP := "github.com/komuw/ote"
-	pkg, err := getPackage(mP, true)
+	mP := "my/mod1"
+	pkg, err := getPackage(mP, gomodFile, true)
 
 	if err != nil {
 		t.Fatal(err)
@@ -40,15 +49,10 @@ func TestGetModules(t *testing.T) {
 		return out
 	})
 
-	expectedModules := []string{
-		"golang.org/x/mod",
-		"github.com/Shopify/sarama",
-		"github.com/nats-io/nats.go",
-		"golang.org/x/tools",
-	}
+	expectedModules := []string{"github.com/Shopify/sarama", "github.com/nats-io/nats.go"}
 
-	mP := "github.com/komuw/ote"
-	m, err := getModules(mP)
+	mP := "my/mod1"
+	m, err := getModules(mP, gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,25 +64,44 @@ func TestGetModules(t *testing.T) {
 }
 
 func TestGetDeps(t *testing.T) {
-	thisMod := "github.com/komuw/ote"
-	_, err := getDeps(thisMod)
+	_, err := getDeps(gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestGetTestDeps(t *testing.T) {
-	thisMod := "github.com/komuw/ote"
-
-	modulePaths, err := getModules(thisMod)
+	thisMod := "my/mod1"
+	modulePaths, err := getModules(thisMod, gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	allDeps, err := getDeps(thisMod)
+	allDeps, err := getDeps(gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	_ = getTestDeps(modulePaths, allDeps)
+}
+
+func TestRun(t *testing.T) {
+	modContents, err := ioutil.ReadFile(gomodFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.Contains(string(modContents), testComment) {
+		t.Errorf("%#+v contained %#+v which is unexpected", gomodFile, testComment)
+	}
+
+	fp := "testdata/mod1"
+	readonly := true
+	buf := new(bytes.Buffer)
+	run(fp, buf, readonly)
+
+	if !strings.Contains(buf.String(), testComment) {
+		t.Errorf("re-rendered %#+v did NOT contain %#+v which is unexpected", gomodFile, testComment)
+	}
+
 }
