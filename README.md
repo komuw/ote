@@ -26,11 +26,23 @@ go get github.com/komuw/ote
 
 ## Usage
 ```bash
-Usage of ote:
-	ote .
-		update go.mod file with a comment next to all dependencies that are test dependencies.
-	ote -r .
-		(readonly) display how the updated go.mod file would look like, without actually updating the file.
+ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
+
+-f string
+    path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
+-r  
+    (readonly) write to stdout instead of updating go.mod file.
+
+examples:
+    ote .
+        update go.mod in the current directory
+    ote -f /tmp/myPkg
+        update go.mod in the /tmp/myPkg directory
+
+    ote -r
+        (readonly) write to stdout instead of updating go.mod file.
+    ote -f /tmp/myPkg -r
+        (readonly) write to stdout instead of updating go.mod file in the /tmp/myPkg directory.
 ```
 
 `ote` takes a `go.mod` file like;

@@ -222,10 +222,14 @@ func main() {
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(),
-			`Usage of ote:
+			`ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
+
+Usage:
+
 -f string
 	path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
--r	(readonly) display how the updated go.mod file would look like, without actually updating the file.
+-r	
+        (readonly) write to stdout instead of updating go.mod file.
 
 examples:
 	ote .
@@ -234,9 +238,9 @@ examples:
 		update go.mod in the /tmp/myPkg directory
 
 	ote -r
-		display how go.mod in the current directory would be updated without actually updating it.
+		(readonly) write to stdout instead of updating go.mod file.
 	ote -f /tmp/myPkg -r
-	    display how go.mod in the /tmp/myPkg directory would be updated without actually updating it.
+	        (readonly) write to stdout instead of updating go.mod file in the /tmp/myPkg directory.
 
 	`)
 	}
