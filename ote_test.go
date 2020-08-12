@@ -1,14 +1,20 @@
 package main
 
 import (
+	"path/filepath"
 	"sort"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 )
 
+var (
+	fp        = "testdata/mod1"
+	gomodFile = filepath.Join(fp, "go.mod")
+)
+
 func TestGetModFile(t *testing.T) {
-	f, err := getModFile()
+	f, err := getModFile(gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +28,7 @@ func TestGetModFile(t *testing.T) {
 
 func TestGetPackage(t *testing.T) {
 	mP := "github.com/komuw/ote"
-	pkg, err := getPackage(mP, true)
+	pkg, err := getPackage(mP, gomodFile, true)
 
 	if err != nil {
 		t.Fatal(err)
@@ -48,7 +54,7 @@ func TestGetModules(t *testing.T) {
 	}
 
 	mP := "github.com/komuw/ote"
-	m, err := getModules(mP)
+	m, err := getModules(mP, gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,8 +66,7 @@ func TestGetModules(t *testing.T) {
 }
 
 func TestGetDeps(t *testing.T) {
-	thisMod := "github.com/komuw/ote"
-	_, err := getDeps(thisMod)
+	_, err := getDeps(gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,8 +74,7 @@ func TestGetDeps(t *testing.T) {
 
 func TestGetTestDeps(t *testing.T) {
 	thisMod := "github.com/komuw/ote"
-
-	modulePaths, err := getModules(thisMod)
+	modulePaths, err := getModules(thisMod, gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,8 +88,8 @@ func TestGetTestDeps(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
-
-	p := "testdata/mod1"
-	_ = p
+	fp := "testdata/mod1"
+	readonly := true
+	run(fp, readonly)
 
 }
