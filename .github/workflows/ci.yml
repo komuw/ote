@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 1
     strategy:
       matrix:
-        go-version: [1.14]
+        go-version: [1.15]
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -47,42 +47,52 @@ jobs:
 
   run_tests:
     name: run_tests
-    timeout-minutes: 1
+    timeout-minutes: 3
     strategy:
       matrix:
-        go-version: [1.14]
+        go-version: [1.15]
         platform: [ubuntu-18.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.14
+          go-version: 1.15
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
 
+      - name: windows Test
+        run: go test -count=1 ./...
+        if: matrix.platform == 'windows-latest'
+
       - name: tests and benchmarks
         run: |
           go test -timeout 1m -race -run=XXXX -bench=. ./...
-          go test -timeout 1m -v -race -cover -coverprofile=coverage.out ./... && bash <(curl -s https://codecov.io/bash)
+          go test -timeout 1m -v -race -cover -coverprofile=coverage.out ./... && curl -s https://codecov.io/bash | bash
           go tool cover -html=coverage.out -o coverage.html
           go tool cover -func=coverage.out
+        if: matrix.platform != 'windows-latest'
 
+      - name: dummy run
+        run: |
+          go build --race -o ote .
+          ./ote -h
+          ./ote -f testdata/mod1 -r
 
   run_analysis:
     name: run_analysis
     timeout-minutes: 1
     strategy:
       matrix:
-        go-version: [1.14]
+        go-version: [1.15]
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.14
+          go-version: 1.15
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
@@ -107,5 +117,5 @@ jobs:
       - name: static analysis
         run: |
           go vet -v -all ./...
-          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.14 -unused.whole-program ./...
+          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.15 -unused.whole-program ./...
           /home/runner/go/bin/gosec ./...
