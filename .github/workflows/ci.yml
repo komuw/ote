@@ -8,7 +8,7 @@ jobs:
 
   check_release_notes:
     name: check_release_notes
-    timeout-minutes: 1
+    timeout-minutes: 2
     strategy:
       matrix:
         go-version: [1.15]
@@ -82,7 +82,7 @@ jobs:
 
   run_analysis:
     name: run_analysis
-    timeout-minutes: 1
+    timeout-minutes: 2
     strategy:
       matrix:
         go-version: [1.15]
