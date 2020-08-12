@@ -65,7 +65,7 @@ jobs:
       - name: tests and benchmarks
         run: |
           go test -timeout 1m -race -run=XXXX -bench=. ./...
-          go test -timeout 1m -v -race -cover -coverprofile=coverage.out ./... && bash <(curl -s https://codecov.io/bash)
+          go test -timeout 1m -v -race -cover -coverprofile=coverage.out ./... && curl -s https://codecov.io/bash | bash
           go tool cover -html=coverage.out -o coverage.html
           go tool cover -func=coverage.out
 
