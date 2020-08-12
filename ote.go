@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -171,7 +172,7 @@ func getTestDeps(impPaths []string, allDeps []modfile.Require) []modfile.Require
 	return testRequires
 }
 
-func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string, readonly bool) error {
+func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
 	notIndirect := []modfile.Require{}
 	for _, v := range testRequires {
 		// we do not want to add a `//test` comment to any requires that allready have `//indirect` comment
@@ -202,14 +203,14 @@ func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string
 	}
 
 	if readonly {
-		fmt.Println(string(b))
+		fmt.Fprintln(w, string(b))
 	} else {
 		fi, err := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
 		if err != nil {
 			return err
 		}
 		_, err = fi.Write(b)
-		fmt.Println("successfully updated go.mod file.")
+		fmt.Fprintln(w, "successfully updated go.mod file.")
 		return err
 	}
 
@@ -256,13 +257,13 @@ examples:
 		"path to directory containing the go.mod file. By default, it uses the current directory.")
 	flag.Parse()
 
-	err := run(f, r)
+	err := run(f, os.Stdout, r)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(fp string, readonly bool) error {
+func run(fp string, w io.Writer, readonly bool) error {
 	gomodFile := filepath.Join(fp, "go.mod")
 
 	f, err := getModFile(gomodFile)
@@ -282,7 +283,7 @@ func run(fp string, readonly bool) error {
 	}
 
 	testRequires := getTestDeps(modulePaths, allDeps)
-	err = updateMod(testRequires, f, gomodFile, readonly)
+	err = updateMod(testRequires, f, gomodFile, w, readonly)
 	if err != nil {
 		return err
 	}

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
+	"io/ioutil"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -19,7 +22,7 @@ func TestGetModFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mP := "github.com/komuw/ote"
+	mP := "my/mod1"
 	if !cmp.Equal(f.Module.Mod.Path, mP) {
 		t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", f.Module.Mod.Path, mP)
 	}
@@ -27,7 +30,7 @@ func TestGetModFile(t *testing.T) {
 }
 
 func TestGetPackage(t *testing.T) {
-	mP := "github.com/komuw/ote"
+	mP := "my/mod1"
 	pkg, err := getPackage(mP, gomodFile, true)
 
 	if err != nil {
@@ -46,14 +49,9 @@ func TestGetModules(t *testing.T) {
 		return out
 	})
 
-	expectedModules := []string{
-		"golang.org/x/mod",
-		"github.com/Shopify/sarama",
-		"github.com/nats-io/nats.go",
-		"golang.org/x/tools",
-	}
+	expectedModules := []string{"github.com/Shopify/sarama", "github.com/nats-io/nats.go"}
 
-	mP := "github.com/komuw/ote"
+	mP := "my/mod1"
 	m, err := getModules(mP, gomodFile)
 	if err != nil {
 		t.Fatal(err)
@@ -73,13 +71,13 @@ func TestGetDeps(t *testing.T) {
 }
 
 func TestGetTestDeps(t *testing.T) {
-	thisMod := "github.com/komuw/ote"
+	thisMod := "my/mod1"
 	modulePaths, err := getModules(thisMod, gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	allDeps, err := getDeps(thisMod)
+	allDeps, err := getDeps(gomodFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -88,8 +86,22 @@ func TestGetTestDeps(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
+	modContents, err := ioutil.ReadFile(gomodFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if strings.Contains(string(modContents), testComment) {
+		t.Errorf("%#+v contained %#+v which is unexpected", gomodFile, testComment)
+	}
+
 	fp := "testdata/mod1"
 	readonly := true
-	run(fp, readonly)
+	buf := new(bytes.Buffer)
+	run(fp, buf, readonly)
+
+	if !strings.Contains(buf.String(), testComment) {
+		t.Errorf("re-rendered %#+v did NOT contain %#+v which is unexpected", gomodFile, testComment)
+	}
 
 }
