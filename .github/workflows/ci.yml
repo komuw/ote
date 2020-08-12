@@ -62,12 +62,17 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
 
+      - name: windows Test
+        run: go test -count=1 ./...
+        if: matrix.platform == 'windows-latest'
+
       - name: tests and benchmarks
         run: |
-          # go test -timeout 1m -race -run=XXXX -bench=. ./...
+          go test -timeout 1m -race -run=XXXX -bench=. ./...
           go test -timeout 1m -v -race -cover -coverprofile=coverage.out ./... && curl -s https://codecov.io/bash | bash
           go tool cover -html=coverage.out -o coverage.html
           go tool cover -func=coverage.out
+        if: matrix.platform != 'windows-latest'
 
       - name: dummy run
         run: |
