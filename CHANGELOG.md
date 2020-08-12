@@ -8,3 +8,4 @@ Most recent version is listed first.
 - Add documentation: https://github.com/komuw/ote/pull/2
 - Add e2e tests: https://github.com/komuw/ote/pull/4
 - add dummy run in CI: https://github.com/komuw/ote/pull/5
+- add versioning script : https://github.com/komuw/ote/pull/6
