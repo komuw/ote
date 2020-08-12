@@ -47,7 +47,7 @@ jobs:
 
   run_tests:
     name: run_tests
-    timeout-minutes: 1
+    timeout-minutes: 3
     strategy:
       matrix:
         go-version: [1.15]
