@@ -22,7 +22,7 @@ func TestGetModFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mP := "my/mod1"
+	mP := "testdata/mod1"
 	if !cmp.Equal(f.Module.Mod.Path, mP) {
 		t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", f.Module.Mod.Path, mP)
 	}
@@ -30,7 +30,7 @@ func TestGetModFile(t *testing.T) {
 }
 
 func TestGetPackage(t *testing.T) {
-	mP := "my/mod1"
+	mP := "testdata/mod1"
 	pkg, err := getPackage(mP, gomodFile, true)
 
 	if err != nil {
@@ -51,7 +51,7 @@ func TestGetModules(t *testing.T) {
 
 	expectedModules := []string{"github.com/Shopify/sarama", "github.com/nats-io/nats.go"}
 
-	mP := "my/mod1"
+	mP := "testdata/mod1"
 	m, err := getModules(mP, gomodFile)
 	if err != nil {
 		t.Fatal(err)
@@ -71,7 +71,7 @@ func TestGetDeps(t *testing.T) {
 }
 
 func TestGetTestDeps(t *testing.T) {
-	thisMod := "my/mod1"
+	thisMod := "testdata/mod1"
 	modulePaths, err := getModules(thisMod, gomodFile)
 	if err != nil {
 		t.Fatal(err)

@@ -1,4 +1,4 @@
-module my/mod1
+module testdata/mod1
 
 go 1.14
 
