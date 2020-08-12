@@ -61,7 +61,7 @@ const goarchList = `386
 const cGo = "cgo"
 
 func getModFile(gomodFile string) (*modfile.File, error) {
-	modContents, err := ioutil.ReadFile(gomodFile)
+	modContents, err := ioutil.ReadFile(filepath.Clean(gomodFile))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 func getDeps(gomodFile string) ([]modfile.Require, error) {
 	requires := []modfile.Require{}
 
-	modContents, err := ioutil.ReadFile(gomodFile)
+	modContents, err := ioutil.ReadFile(filepath.Clean(gomodFile))
 	if err != nil {
 		return requires, err
 	}
