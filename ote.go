@@ -1,3 +1,6 @@
+// ote: updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
+//
+// It is mostly useful in places where it is important to audit all dependencies that are going to run in production.
 package main
 
 import (

@@ -2,6 +2,7 @@
 
 [![ci](https://github.com/komuw/ote/workflows/ote%20ci/badge.svg)](https://github.com/komuw/ote/actions)
 [![codecov](https://codecov.io/gh/komuw/ote/branch/master/graph/badge.svg)](https://codecov.io/gh/komuw/ote)
+[![PkgGoDev](https://pkg.go.dev/badge/https://pkg.go.dev/github.com/komuw/ote)](https://pkg.go.dev/github.com/komuw/ote)
 
 
 `ote` updates a packages' `go.mod` file with a comment next to all dependencies that are test dependencies; identifying them as such.   
