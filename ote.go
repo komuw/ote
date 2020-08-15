@@ -224,9 +224,9 @@ func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string
 	return nil
 }
 
-func main() {
-	var r bool
+func cli() (string, bool) {
 	var f string
+	var r bool
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(),
@@ -252,17 +252,22 @@ examples:
 
 	`)
 	}
-	flag.BoolVar(
-		&r,
-		"r",
-		false,
-		"(readonly) display how the updated go.mod file would look like, without actually updating the file.")
 	flag.StringVar(
 		&f,
 		"f",
 		".",
 		"path to directory containing the go.mod file. By default, it uses the current directory.")
+	flag.BoolVar(
+		&r,
+		"r",
+		false,
+		"(readonly) display how the updated go.mod file would look like, without actually updating the file.")
 	flag.Parse()
+
+	return f, r
+}
+func main() {
+	f, r := cli()
 
 	err := run(f, os.Stdout, r)
 	if err != nil {
