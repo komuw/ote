@@ -69,9 +69,9 @@ jobs:
       - name: tests and benchmarks
         run: |
           go test -timeout 1m -race -run=XXXX -bench=. ./...
-          go test -timeout 1m -v -race -cover -coverprofile=coverage.out ./... && curl -s https://codecov.io/bash | bash
-          go tool cover -html=coverage.out -o coverage.html
-          go tool cover -func=coverage.out
+          go test -timeout 1m -v -race -cover -coverprofile=coverage.txt ./... && curl -s https://codecov.io/bash | bash
+          go tool cover -html=coverage.txt -o coverage.html
+          go tool cover -func=coverage.txt
         if: matrix.platform != 'windows-latest'
 
       - name: dummy run
