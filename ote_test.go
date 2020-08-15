@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 	"sort"
@@ -198,23 +199,27 @@ require (
 	}
 
 	for _, v := range tt {
-		originalMod, err := ioutil.ReadFile(v.modFilePath)
-		if err != nil {
-			t.Fatal(err)
-		}
+		v := v // capture range variable
+		t.Run(fmt.Sprintf("runing test for modFilePath: %s", v.modFilePath), func(t *testing.T) {
+			t.Parallel()
+			originalMod, err := ioutil.ReadFile(v.modFilePath)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-		// NB: you can use `github.com/kylelemons/godebug/diff` to find out how to make two strings equal
-		// diff := diff.Diff(string(v.expectedModfile), string(originalMod))
-		if !cmp.Equal(originalMod, v.expectedModfile) {
-			t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", originalMod, v.expectedModfile)
-		}
+			// NB: you can use `github.com/kylelemons/godebug/diff` to find out how to make two strings equal
+			// diff := diff.Diff(string(v.expectedModfile), string(originalMod))
+			if !cmp.Equal(originalMod, v.expectedModfile) {
+				t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", originalMod, v.expectedModfile)
+			}
 
-		readonly := true
-		oteMod := new(bytes.Buffer)
-		run(v.fp, oteMod, readonly)
+			readonly := true
+			oteMod := new(bytes.Buffer)
+			run(v.fp, oteMod, readonly)
 
-		if !cmp.Equal(oteMod.Bytes(), v.expectedModifiedModfile) {
-			t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", originalMod, v.expectedModifiedModfile)
-		}
+			if !cmp.Equal(oteMod.Bytes(), v.expectedModifiedModfile) {
+				t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", originalMod, v.expectedModifiedModfile)
+			}
+		})
 	}
 }

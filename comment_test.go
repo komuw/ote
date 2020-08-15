@@ -52,6 +52,7 @@ func TestIsTest(t *testing.T) {
 	}
 
 	for _, v := range tt {
+		v := v // capture range variable
 		res := isTest(v.line)
 
 		if !cmp.Equal(res, v.expected) {
@@ -147,6 +148,7 @@ func TestSetTest(t *testing.T) {
 	}
 
 	for _, v := range tt {
+		v := v // capture range variable
 		setTest(v.line, v.add)
 
 		token := ""
