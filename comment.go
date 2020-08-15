@@ -62,27 +62,42 @@ func isTest(line *modfile.Line) bool {
 	return (len(f) == 1 && f[0] == "test" || len(f) > 1 && f[0] == "test;")
 }
 
-// setTest sets line to have a "// test" comment.
-func setTest(line *modfile.Line) {
-	if isTest(line) {
+// setTest sets line to have(or not have) a "// test" comment.
+func setTest(line *modfile.Line, add bool) {
+	if isTest(line) == add {
 		return
 	}
 
-	// Adding comment.
-	if len(line.Suffix) == 0 {
-		// New comment.
-		line.Suffix = []modfile.Comment{{Token: testComment, Suffix: true}}
-		return
-	}
+	if add {
+		// Adding comment.
+		if len(line.Suffix) == 0 {
+			// New comment.
+			line.Suffix = []modfile.Comment{{Token: testComment, Suffix: true}}
+			return
+		}
 
-	com := &line.Suffix[0]
-	text := strings.TrimSpace(strings.TrimPrefix(com.Token, string(slashSlash)))
-	if text == "" {
-		// Empty comment.
-		com.Token = testComment
-		return
-	}
+		com := &line.Suffix[0]
+		text := strings.TrimSpace(strings.TrimPrefix(com.Token, string(slashSlash)))
+		if text == "" {
+			// Empty comment.
+			com.Token = testComment
+			return
+		}
 
-	// Insert at beginning of existing comment.
-	com.Token = "// test; " + text
+		// Insert at beginning of existing comment.
+		com.Token = "// test; " + text
+	} else {
+		// Removing comment.
+		f := strings.Fields(line.Suffix[0].Token)
+		if len(f) == 2 {
+			// Remove whole comment.
+			line.Suffix = nil
+			return
+		}
+
+		// Remove comment prefix.
+		com := &line.Suffix[0]
+		i := strings.Index(com.Token, "test;")
+		com.Token = "//" + com.Token[i+len("test;"):]
+	}
 }

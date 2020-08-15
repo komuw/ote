@@ -52,6 +52,7 @@ func TestIsTest(t *testing.T) {
 	}
 
 	for _, v := range tt {
+		v := v // capture range variable
 		res := isTest(v.line)
 
 		if !cmp.Equal(res, v.expected) {
@@ -67,6 +68,7 @@ func TestSetTest(t *testing.T) {
 	tt := []struct {
 		line     *modfile.Line
 		expected string
+		add      bool
 	}{
 
 		{
@@ -82,6 +84,7 @@ func TestSetTest(t *testing.T) {
 				},
 			},
 			expected: "// test\n",
+			add:      true,
 		},
 
 		{
@@ -97,6 +100,7 @@ func TestSetTest(t *testing.T) {
 				},
 			},
 			expected: "// test; someOtherComment",
+			add:      true,
 		},
 
 		{
@@ -107,17 +111,54 @@ func TestSetTest(t *testing.T) {
 				},
 			},
 			expected: "// test",
+			add:      true,
+		},
+
+		{
+			line: &modfile.Line{
+				Comments: modfile.Comments{
+					Suffix: []modfile.Comment{
+						{
+							// existing `test` comment is REMOVED and any other comment left intact
+							Token:  "// test; priorComment\n",
+							Suffix: true,
+						},
+					},
+				},
+			},
+			expected: "// priorComment\n",
+			add:      false,
+		},
+
+		{
+			line: &modfile.Line{
+				Comments: modfile.Comments{
+					Suffix: []modfile.Comment{
+						{
+							// existing `test` comment is removed
+							Token:  "// test\n",
+							Suffix: true,
+						},
+					},
+				},
+			},
+			expected: "",
+			add:      false,
 		},
 	}
 
 	for _, v := range tt {
-		setTest(v.line)
-		token := v.line.Comments.Suffix[0].Token
+		v := v // capture range variable
+		setTest(v.line, v.add)
+
+		token := ""
+		if v.line.Comments.Suffix != nil {
+			// v.line.Comments.Suffix  is nil if there is no comment
+			token = v.line.Comments.Suffix[0].Token
+		}
 
 		if !cmp.Equal(token, v.expected) {
 			t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", token, v.expected)
 		}
-
 	}
-
 }
