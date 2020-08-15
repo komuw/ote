@@ -3,6 +3,10 @@
 Most recent version is listed first.  
 
 
+## v0.0.2
+- add some quality metrics: https://github.com/komuw/ote/pull/9
+
+
 ## v0.0.1
 - Add CLI: https://github.com/komuw/ote/pull/1
 - Add documentation: https://github.com/komuw/ote/pull/2

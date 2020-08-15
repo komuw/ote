@@ -85,6 +85,18 @@ func TestGetTestDeps(t *testing.T) {
 	_ = getTestDeps(modulePaths, allDeps)
 }
 
+func TestCli(t *testing.T) {
+	f, r := cli()
+
+	if !cmp.Equal(f, ".") {
+		t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", f, ".")
+	}
+
+	if !cmp.Equal(r, false) {
+		t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", r, false)
+	}
+}
+
 func TestRun(t *testing.T) {
 	modContents, err := ioutil.ReadFile(gomodFile)
 	if err != nil {
