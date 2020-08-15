@@ -188,11 +188,25 @@ func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string
 		}
 	}
 
-	for _, ni := range notIndirect {
+	if len(testRequires) < 0 {
+		// if there are no test dependencies, we need to go through all the deps and
+		// remove any test comments that there may be there.
 		for _, fr := range f.Require {
-			if ni.Mod == fr.Mod {
-				line := fr.Syntax
-				setTest(line)
+			line := fr.Syntax
+			setTest(line, false)
+		}
+	} else {
+		for _, ni := range notIndirect {
+			for _, fr := range f.Require {
+				if ni.Mod == fr.Mod {
+					// add test comment
+					line := fr.Syntax
+					setTest(line, true)
+				} else {
+					// remove test comment for any module that may be used in both test files and non-test files
+					line := fr.Syntax
+					setTest(line, false)
+				}
 			}
 		}
 	}
@@ -296,6 +310,7 @@ func run(fp string, w io.Writer, readonly bool) error {
 	}
 
 	testRequires := getTestDeps(modulePaths, allDeps)
+
 	err = updateMod(testRequires, f, gomodFile, w, readonly)
 	if err != nil {
 		return err
