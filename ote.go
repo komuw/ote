@@ -182,7 +182,7 @@ func getTestDeps(impPaths []string, allDeps []modfile.Require) []modfile.Require
 func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
 	notIndirect := []modfile.Require{}
 	for _, v := range testRequires {
-		// we do not want to add a `//test` comment to any requires that allready have `//indirect` comment
+		// we do not want to add a `//test` comment to any requires that already have `//indirect` comment
 		if !v.Indirect {
 			notIndirect = append(notIndirect, v)
 		}
