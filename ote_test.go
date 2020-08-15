@@ -201,7 +201,6 @@ require (
 	for _, v := range tt {
 		v := v // capture range variable
 		t.Run(fmt.Sprintf("runing test for modFilePath: %s", v.modFilePath), func(t *testing.T) {
-			t.Parallel()
 			originalMod, err := ioutil.ReadFile(v.modFilePath)
 			if err != nil {
 				t.Fatal(err)
