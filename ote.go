@@ -3,6 +3,7 @@
 // It maybe useful in places where it is important to audit all dependencies that are going to run in production.
 //
 // Install: go get github.com/komuw/ote
+//
 // Usage: ote .
 //
 package main
