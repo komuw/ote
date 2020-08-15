@@ -224,6 +224,15 @@ func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string
 	return nil
 }
 
+func main() {
+	f, r := cli()
+
+	err := run(f, os.Stdout, r)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func cli() (string, bool) {
 	var f string
 	var r bool
@@ -265,14 +274,6 @@ examples:
 	flag.Parse()
 
 	return f, r
-}
-func main() {
-	f, r := cli()
-
-	err := run(f, os.Stdout, r)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
