@@ -100,43 +100,7 @@ func getPackage(pattern string, gomodFile string, mainModule bool) (*packages.Pa
 	}
 	pkg := pkgs[0]
 
-	// fmt.Println("pkg.GoFiles: ", pkg.GoFiles)
-	// fmt.Println("pkg.CompiledGoFiles: ", pattern, "::", pkg.CompiledGoFiles)
-
 	return pkg, nil
-}
-
-var morePkgs = []string{}
-
-func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
-	fmt.Println("srcDir: ", srcDir)
-	return func(path string, info os.FileInfo, err error) error {
-		// TODO: i'm not sure about excluding `tests` dirctory
-		if info.IsDir() &&
-			!strings.Contains(path, "vendor") &&
-			!strings.Contains(path, "internal") &&
-			!strings.Contains(path, "tests") &&
-			!strings.Contains(path, "testdata") &&
-			!strings.Contains(path, "website") &&
-			!strings.Contains(path, "ui") &&
-			!strings.Contains(path, "e2e") &&
-			!strings.Contains(path, "scripts") &&
-			!strings.Contains(path, ".git") &&
-			!strings.Contains(path, "demo") &&
-			!strings.Contains(path, "plugins") &&
-			!strings.Contains(path, ".circleci") &&
-			!strings.Contains(path, ".netlify") {
-
-			// fmt.Println("path: ", path)
-			// fmt.Println("info.Name(): ", info.Name())
-
-			replacer := strings.Replace(path, srcDir, "", -1)
-			joinedPath := filepath.Join(pattern, replacer)
-			morePkgs = append(morePkgs, joinedPath)
-		}
-
-		return err
-	}
 }
 
 // getModules finds all the modules that have been used/imported by a module
@@ -158,10 +122,10 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 	if err != nil {
 		return modulePaths, err
 	}
-	morePkgs = dedupe(morePkgs)
-	fmt.Println("morePkgs: ", morePkgs)
+	pkgsFromDir = dedupe(pkgsFromDir)
+	// fmt.Println("pkgsFromDir: ", pkgsFromDir)
 
-	for _, v := range morePkgs {
+	for _, v := range pkgsFromDir {
 		pkg, err := getPackage(v, gomodFile, true)
 		if err != nil {
 			return modulePaths, err

@@ -1,6 +1,11 @@
 package main
 
-import "sort"
+import (
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+)
 
 func dedupe(in []string) []string {
 	sort.Strings(in)
@@ -18,3 +23,25 @@ func dedupe(in []string) []string {
 	result := in[:j+1]
 	return result
 }
+
+var pkgsFromDir = []string{}
+
+func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() &&
+			!strings.Contains(path, "vendor") &&
+			!strings.Contains(path, "internal") &&
+			!strings.Contains(path, "tests") &&
+			!strings.Contains(path, "test") &&
+			!strings.Contains(path, "testdata") &&
+			!strings.Contains(path, ".") {
+
+			ext := strings.Replace(path, srcDir, "", -1)
+			joinedPath := filepath.Join(pattern, ext)
+			pkgsFromDir = append(pkgsFromDir, joinedPath)
+		}
+		return err
+	}
+}
+
+// TODO: rename this file
