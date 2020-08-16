@@ -99,7 +99,43 @@ func getPackage(pattern string, gomodFile string, mainModule bool) (*packages.Pa
 	}
 	pkg := pkgs[0]
 
+	// fmt.Println("pkg.GoFiles: ", pkg.GoFiles)
+	// fmt.Println("pkg.CompiledGoFiles: ", pattern, "::", pkg.CompiledGoFiles)
+
 	return pkg, nil
+}
+
+var morePkgs = []string{}
+
+func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
+	fmt.Println("srcDir: ", srcDir)
+	return func(path string, info os.FileInfo, err error) error {
+		// TODO: i'm not sure about excluding `tests` dirctory
+		if info.IsDir() &&
+			!strings.Contains(path, "vendor") &&
+			!strings.Contains(path, "internal") &&
+			!strings.Contains(path, "tests") &&
+			!strings.Contains(path, "testdata") &&
+			!strings.Contains(path, "website") &&
+			!strings.Contains(path, "ui") &&
+			!strings.Contains(path, "e2e") &&
+			!strings.Contains(path, "scripts") &&
+			!strings.Contains(path, ".git") &&
+			!strings.Contains(path, "demo") &&
+			!strings.Contains(path, "plugins") &&
+			!strings.Contains(path, ".circleci") &&
+			!strings.Contains(path, ".netlify") {
+
+			// fmt.Println("path: ", path)
+			// fmt.Println("info.Name(): ", info.Name())
+
+			replacer := strings.Replace(path, srcDir, "", -1)
+			joinedPath := filepath.Join(pattern, replacer)
+			morePkgs = append(morePkgs, joinedPath)
+		}
+
+		return err
+	}
 }
 
 // getModules finds all the modules that have been used/imported by a module
@@ -114,8 +150,38 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 	for impPath := range mainPkg.Imports {
 		impPaths = append(impPaths, impPath)
 	}
+	impPaths = dedupe(impPaths)
+	fmt.Println("pattern", pattern)
+	fmt.Println("impPaths: ", impPaths)
 
 	for _, v := range impPaths {
+		if strings.Contains(v, pattern) {
+			pkg, err := getPackage(v, gomodFile, false)
+			if err != nil {
+				// maybe we should continue, instead of returning?
+				return modulePaths, err
+			}
+			if pkg.Module == nil {
+				// something like `fmt` has a `.Module` that is nil
+				continue
+			}
+
+			if pkg.Module.Path != "" {
+				modulePaths = append(modulePaths, pkg.Module.Path)
+			}
+		}
+	}
+
+	///////////////////////////
+	dir := filepath.Dir(gomodFile)
+	err = filepath.Walk(dir, walkFnClosure(dir, pattern))
+	if err != nil {
+		return modulePaths, err
+	}
+	fmt.Println("morePkgs: ", morePkgs)
+	morePkgs = dedupe(morePkgs)
+
+	for _, v := range morePkgs {
 		pkg, err := getPackage(v, gomodFile, false)
 		if err != nil {
 			// maybe we should continue, instead of returning?
@@ -130,7 +196,9 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 			modulePaths = append(modulePaths, pkg.Module.Path)
 		}
 	}
+	//////////////////////////
 
+	modulePaths = dedupe(modulePaths)
 	return modulePaths, nil
 }
 
@@ -303,6 +371,7 @@ func run(fp string, w io.Writer, readonly bool) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("modulePaths: ", modulePaths)
 
 	allDeps, err := getDeps(gomodFile)
 	if err != nil {
