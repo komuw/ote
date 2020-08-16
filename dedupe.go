@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"golang.org/x/tools/go/packages"
 )
 
 func dedupe(in []string) []string {
@@ -49,6 +51,25 @@ func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
 		}
 		return err
 	}
+}
+
+var stdLibPkgs = make(map[string]struct{})
+
+func loadStd() error {
+	pkgs, err := packages.Load(nil, "std")
+	if err != nil {
+		return err
+	}
+
+	for _, p := range pkgs {
+		stdLibPkgs[p.PkgPath] = struct{}{}
+	}
+	return nil
+}
+
+func isStdLibPkg(pkg string) bool {
+	_, ok := stdLibPkgs[pkg]
+	return ok
 }
 
 // TODO: rename this file

@@ -140,6 +140,10 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 	///////////////////////// ADDED ////////////////////////
 
 	for _, v := range impPaths {
+		if isStdLibPkg(v) {
+			continue
+		}
+
 		pkg, err := getPackage(v, gomodFile, false)
 		if err != nil {
 			// maybe we should continue, instead of returning?
@@ -316,6 +320,11 @@ examples:
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
+	err := loadStd()
+	if err != nil {
+		return err
+	}
+
 	gomodFile := filepath.Join(fp, "go.mod")
 
 	f, err := getModFile(gomodFile)
