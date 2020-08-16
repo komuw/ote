@@ -151,38 +151,31 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 	for impPath := range mainPkg.Imports {
 		impPaths = append(impPaths, impPath)
 	}
-	impPaths = dedupe(impPaths)
-	fmt.Println("pattern", pattern)
-	fmt.Println("impPaths: ", impPaths)
 
-	for _, v := range impPaths {
-		if strings.Contains(v, pattern) {
-			pkg, err := getPackage(v, gomodFile, false)
-			if err != nil {
-				// maybe we should continue, instead of returning?
-				return modulePaths, err
-			}
-			if pkg.Module == nil {
-				// something like `fmt` has a `.Module` that is nil
-				continue
-			}
-
-			if pkg.Module.Path != "" {
-				modulePaths = append(modulePaths, pkg.Module.Path)
-			}
-		}
-	}
-
-	///////////////////////////
+	///////////////////////// ADDED ////////////////////////
 	dir := filepath.Dir(gomodFile)
 	err = filepath.Walk(dir, walkFnClosure(dir, pattern))
 	if err != nil {
 		return modulePaths, err
 	}
-	fmt.Println("morePkgs: ", morePkgs)
 	morePkgs = dedupe(morePkgs)
+	fmt.Println("morePkgs: ", morePkgs)
 
 	for _, v := range morePkgs {
+		pkg, err := getPackage(v, gomodFile, true)
+		if err != nil {
+			return modulePaths, err
+		}
+		for impPath := range pkg.Imports {
+			impPaths = append(impPaths, impPath)
+		}
+	}
+	impPaths = dedupe(impPaths)
+	fmt.Println("pattern", pattern)
+	fmt.Println("impPaths: ", impPaths)
+	///////////////////////// ADDED ////////////////////////
+
+	for _, v := range impPaths {
 		pkg, err := getPackage(v, gomodFile, false)
 		if err != nil {
 			// maybe we should continue, instead of returning?
@@ -197,9 +190,8 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 			modulePaths = append(modulePaths, pkg.Module.Path)
 		}
 	}
-	//////////////////////////
-
 	modulePaths = dedupe(modulePaths)
+
 	return modulePaths, nil
 }
 
