@@ -10,7 +10,11 @@ import (
 func dedupe(in []string) []string {
 	if len(in) <= 0 {
 		return in
+	} else if len(in) <= 4 {
+		// deduping a small slice is probably wasteful
+		return in
 	}
+
 	sort.Strings(in)
 	j := 0
 	for i := 1; i < len(in); i++ {
