@@ -39,7 +39,6 @@ func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() &&
 			!strings.Contains(path, "vendor") &&
-			!strings.Contains(path, "internal") &&
 			!strings.Contains(path, "tests") &&
 			!strings.Contains(path, "test") &&
 			!strings.Contains(path, "testdata") &&
