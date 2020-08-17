@@ -18,8 +18,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/sanity-io/litter"
 	"golang.org/x/mod/modfile"
 	"golang.org/x/tools/go/packages"
+
+	"go/ast"
+	"go/parser"
+	"go/token"
 )
 
 // This lists are got from https://github.com/golang/go/blob/master/src/go/build/syslist.go
@@ -319,37 +324,87 @@ examples:
 	return f, r
 }
 
+func myFilter(os.FileInfo) bool {
+	return false
+}
+func nameFilter(filename string) bool {
+	switch filename {
+	case "parser.go", "interface.go", "parser_test.go":
+		return true
+	case "parser.go.orig":
+		return true // permit but should be ignored by ParseDir
+	}
+	return false
+}
+
+func dirFilter(f os.FileInfo) bool { return nameFilter(f.Name()) }
+
+func parse(fp string) error {
+	pkgs, err := parser.ParseDir(token.NewFileSet(), fp, nil, parser.ImportsOnly)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("pkgs: ", pkgs)
+
+	litter.Dump(pkgs["main"].Imports)
+
+	importss := []string{}
+	for k, v := range pkgs {
+		fmt.Println("package: ", k)
+		for _, p := range v.Files {
+			for _, x := range p.Decls {
+				y, ok := x.(*ast.GenDecl)
+				if ok {
+					for _, x := range y.Specs {
+						a, ok := x.(*ast.ImportSpec)
+						if ok {
+							fmt.Println("a.Path.Value: ", a.Path.Value)
+							importss = append(importss, a.Path.Value)
+						}
+					}
+				}
+
+			}
+		}
+	}
+	fmt.Println("importss: ", importss)
+	return nil
+}
+
 func run(fp string, w io.Writer, readonly bool) error {
 	err := loadStd()
 	if err != nil {
 		return err
 	}
 
-	gomodFile := filepath.Join(fp, "go.mod")
+	parse(fp)
 
-	f, err := getModFile(gomodFile)
-	if err != nil {
-		return err
-	}
-	thisMod := f.Module.Mod.Path
+	// gomodFile := filepath.Join(fp, "go.mod")
 
-	modulePaths, err := getModules(thisMod, gomodFile)
-	if err != nil {
-		return err
-	}
-	fmt.Println("modulePaths: ", modulePaths)
+	// f, err := getModFile(gomodFile)
+	// if err != nil {
+	// 	return err
+	// }
+	// thisMod := f.Module.Mod.Path
 
-	allDeps, err := getDeps(gomodFile)
-	if err != nil {
-		return err
-	}
+	// modulePaths, err := getModules(thisMod, gomodFile)
+	// if err != nil {
+	// 	return err
+	// }
+	// fmt.Println("modulePaths: ", modulePaths)
 
-	testRequires := getTestDeps(modulePaths, allDeps)
+	// allDeps, err := getDeps(gomodFile)
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = updateMod(testRequires, f, gomodFile, w, readonly)
-	if err != nil {
-		return err
-	}
+	// testRequires := getTestDeps(modulePaths, allDeps)
+
+	// err = updateMod(testRequires, f, gomodFile, w, readonly)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
