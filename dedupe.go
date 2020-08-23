@@ -43,13 +43,12 @@ func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
 			return nil
 		}
 
+		ext := strings.Replace(path, srcDir, "", -1)
 		// TODO: this heuristic is bad. It will weed out a legitimate package like `myVendorPkg`
-		if strings.Contains(path, "vendor") || strings.Contains(path, "test") || strings.Contains(path, "testdata") || strings.Contains(path, ".") {
+		if strings.Contains(ext, "vendor") || strings.Contains(ext, "test") || strings.Contains(ext, "testdata") || strings.Contains(ext, ".") {
 			// exclude this paths
 			return nil
 		}
-
-		ext := strings.Replace(path, srcDir, "", -1)
 		joinedPath := filepath.Join(pattern, ext)
 		pkgsFromDir = append(pkgsFromDir, joinedPath)
 		return nil
