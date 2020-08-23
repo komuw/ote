@@ -123,7 +123,7 @@ func getModules(pattern string, gomodFile string) ([]string, error) {
 		return modulePaths, err
 	}
 	pkgsFromDir = dedupe(pkgsFromDir)
-	fmt.Println("pkgsFromDir: ", pkgsFromDir)
+	// fmt.Println("pkgsFromDir: ", pkgsFromDir)
 
 	for _, v := range pkgsFromDir {
 		pkg, err := getPackage(v, gomodFile, true)

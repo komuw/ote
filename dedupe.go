@@ -43,7 +43,8 @@ func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
 			return nil
 		}
 
-		if strings.Contains(path, "vendor") || strings.Contains(path, "tests") || strings.Contains(path, "test") || strings.Contains(path, "testdata") || strings.Contains(path, ".") {
+		// TODO: this heuristic is bad. It will weed out a legitimate package like `myVendorPkg`
+		if strings.Contains(path, "vendor") || strings.Contains(path, "test") || strings.Contains(path, "testdata") || strings.Contains(path, ".") {
 			// exclude this paths
 			return nil
 		}
