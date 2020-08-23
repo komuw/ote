@@ -37,19 +37,21 @@ var pkgsFromDir = []string{}
 
 func walkFnClosure(srcDir string, pattern string) filepath.WalkFunc {
 	return func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() &&
-			!strings.Contains(path, "vendor") &&
-			!strings.Contains(path, "internal") &&
-			!strings.Contains(path, "tests") &&
-			!strings.Contains(path, "test") &&
-			!strings.Contains(path, "testdata") &&
-			!strings.Contains(path, ".") {
 
-			ext := strings.Replace(path, srcDir, "", -1)
-			joinedPath := filepath.Join(pattern, ext)
-			pkgsFromDir = append(pkgsFromDir, joinedPath)
+		if !info.IsDir() {
+			// we are only interested in directories
+			return nil
 		}
-		return err
+
+		if strings.Contains(path, "vendor") || strings.Contains(path, "tests") || strings.Contains(path, "test") || strings.Contains(path, "testdata") || strings.Contains(path, ".") {
+			// exclude this paths
+			return nil
+		}
+
+		ext := strings.Replace(path, srcDir, "", -1)
+		joinedPath := filepath.Join(pattern, ext)
+		pkgsFromDir = append(pkgsFromDir, joinedPath)
+		return nil
 	}
 }
 
