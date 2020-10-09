@@ -72,7 +72,7 @@ jobs:
 
       - name: dummy run
         run: |
-          go build --race -o ote .
+          go build -trimpath --race -o ote .
           ./ote -h
           ./ote -f testdata/mod1 -r
 
