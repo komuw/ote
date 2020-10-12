@@ -255,7 +255,7 @@ require (
 			run(v.fp, oteMod, readonly)
 
 			if !cmp.Equal(oteMod.Bytes(), v.expectedModifiedModfile) {
-				diff := diff.Diff(string(v.expectedModifiedModfile), string(oteMod.Bytes()))
+				diff := diff.Diff(string(v.expectedModifiedModfile), oteMod.String())
 				t.Errorf("\n modified modfile mismatch, diff: \n======================\n%s\n======================\n", diff)
 			}
 		})
