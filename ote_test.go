@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/kylelemons/godebug/diff"
 )
 
 var (
@@ -113,9 +114,10 @@ func TestRun(t *testing.T) {
 go 1.14
 
 require (
-	github.com/google/go-cmp v0.5.0 // test
+	github.com/google/go-cmp v0.5.2 // test
+	github.com/kylelemons/godebug v1.1.0 // test
 	golang.org/x/mod v0.3.0
-	golang.org/x/tools v0.0.0-20200811215021-48a8ffc5b207
+	golang.org/x/tools v0.0.0-20201012192620-5bd05386311b
 )
 `),
 			expectedModifiedModfile: []byte(`module github.com/komuw/ote
@@ -123,9 +125,10 @@ require (
 go 1.14
 
 require (
-	github.com/google/go-cmp v0.5.0 // test
+	github.com/google/go-cmp v0.5.2 // test
+	github.com/kylelemons/godebug v1.1.0 // test
 	golang.org/x/mod v0.3.0
-	golang.org/x/tools v0.0.0-20200811215021-48a8ffc5b207
+	golang.org/x/tools v0.0.0-20201012192620-5bd05386311b
 )
 
 `),
@@ -156,7 +159,7 @@ go 1.14
 require (
 	github.com/Shopify/sarama v1.27.0
 	github.com/golang/protobuf v1.4.2 // indirect
-	github.com/google/go-cmp v0.5.1
+	github.com/google/go-cmp v0.5.1 // test
 	github.com/nats-io/nats-server/v2 v2.1.7 // indirect
 	github.com/nats-io/nats.go v1.10.0
 	github.com/stretchr/testify v1.6.1 // test; SomePriorComment
@@ -196,6 +199,40 @@ require (
 
 `),
 		},
+
+		{
+			fp:          "testdata/mod5",
+			modFilePath: "testdata/mod5/go.mod",
+			expectedModfile: []byte(`module testdata/mod5
+
+go 1.15
+
+require (
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/google/go-cmp v0.5.2
+	github.com/komuw/kama v0.0.0-20201012123531-9c57efc1ae36
+	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
+	github.com/nats-io/nats.go v1.10.0
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
+)
+`),
+			expectedModifiedModfile: []byte(`module testdata/mod5
+
+go 1.15
+
+require (
+	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/google/go-cmp v0.5.2 // test
+	github.com/komuw/kama v0.0.0-20201012123531-9c57efc1ae36 // test
+	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
+	github.com/nats-io/nats.go v1.10.0
+	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
+)
+
+`),
+		},
 	}
 
 	for _, v := range tt {
@@ -209,7 +246,8 @@ require (
 			// NB: you can use `github.com/kylelemons/godebug/diff` to find out how to make two strings equal
 			// diff := diff.Diff(string(v.expectedModfile), string(originalMod))
 			if !cmp.Equal(originalMod, v.expectedModfile) {
-				t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", originalMod, v.expectedModfile)
+				diff := diff.Diff(string(v.expectedModfile), string(originalMod))
+				t.Errorf("\n original modfile mismatch, diff: \n======================\n%s\n======================\n", diff)
 			}
 
 			readonly := true
@@ -217,7 +255,8 @@ require (
 			run(v.fp, oteMod, readonly)
 
 			if !cmp.Equal(oteMod.Bytes(), v.expectedModifiedModfile) {
-				t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", originalMod, v.expectedModifiedModfile)
+				diff := diff.Diff(string(v.expectedModifiedModfile), oteMod.String())
+				t.Errorf("\n modified modfile mismatch, diff: \n======================\n%s\n======================\n", diff)
 			}
 		})
 	}

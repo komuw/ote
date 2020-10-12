@@ -3,6 +3,10 @@
 Most recent version is listed first.  
 
 
+## v0.0.3
+-  take into account files ending in _test.go: https://github.com/komuw/ote/pull/14
+
+
 ## v0.0.2
 - add some quality metrics: https://github.com/komuw/ote/pull/9
 - add ability to remove test comments: https://github.com/komuw/ote/pull/10

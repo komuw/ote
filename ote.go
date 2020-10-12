@@ -179,7 +179,7 @@ func getTestDeps(impPaths []string, allDeps []modfile.Require) []modfile.Require
 	return testRequires
 }
 
-func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
+func updateMod(testRequires []modfile.Require, f *modfile.File) error {
 	notIndirect := []modfile.Require{}
 	for _, v := range testRequires {
 		// we do not want to add a `//test` comment to any requires that already have `//indirect` comment
@@ -195,22 +195,45 @@ func updateMod(testRequires []modfile.Require, f *modfile.File, gomodFile string
 			line := fr.Syntax
 			setTest(line, false)
 		}
-	} else {
-		for _, ni := range notIndirect {
-			for _, fr := range f.Require {
-				if ni.Mod == fr.Mod {
-					// add test comment
-					line := fr.Syntax
-					setTest(line, true)
-				} else {
-					// remove test comment for any module that may be used in both test files and non-test files
-					line := fr.Syntax
-					setTest(line, false)
-				}
+
+		return nil
+	}
+
+	for _, ni := range notIndirect {
+		for _, fr := range f.Require {
+			if ni.Mod == fr.Mod {
+				// add test comment
+				line := fr.Syntax
+				setTest(line, true)
 			}
 		}
 	}
 
+	// contains tells whether a contains x.
+	contains := func(a []modfile.Require, x modfile.Require) bool {
+		for _, n := range a {
+			if x.Mod == n.Mod {
+				return true
+			}
+		}
+		return false
+	}
+
+	for _, fr := range f.Require {
+		line := fr.Syntax
+		if isTest(line) {
+			if !contains(testRequires, *fr) {
+				// Remove test comment for any module that may be used in both test files and non-test files.
+				// If a module has a test comment but is not in testRequires, it should be removed.
+				setTest(line, false)
+			}
+		}
+	}
+
+	return nil
+}
+
+func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
 	f.SortBlocks()
 	f.Cleanup()
 	b, err := f.Format()
@@ -310,8 +333,12 @@ func run(fp string, w io.Writer, readonly bool) error {
 	}
 
 	testRequires := getTestDeps(modulePaths, allDeps)
+	err = updateMod(testRequires, f)
+	if err != nil {
+		return err
+	}
 
-	err = updateMod(testRequires, f, gomodFile, w, readonly)
+	err = writeMod(f, gomodFile, w, readonly)
 	if err != nil {
 		return err
 	}

@@ -107,8 +107,8 @@ jobs:
           /tmp/gobin honnef.co/go/tools/cmd/staticcheck@$STATICCHECK_VERSION
           /tmp/gobin github.com/securego/gosec/cmd/gosec
         env:
-          GOBIN_VERSION: 'v0.0.11'
-          STATICCHECK_VERSION: '2020.1.4'
+          GOBIN_VERSION: 'v0.0.14'
+          STATICCHECK_VERSION: '2020.1.6'
 
       - name: static analysis
         run: |
