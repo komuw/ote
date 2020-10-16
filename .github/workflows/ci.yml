@@ -119,5 +119,5 @@ jobs:
 
           mkdir -p /tmp/dgryski/semgrep-go && \
           wget -nc --output-document=/tmp/dgryski/semgrep-go/rules.go https://raw.githubusercontent.com/dgryski/semgrep-go/master/ruleguard.rules.go && \
-          /home/runner/go/bin/ruleguard -rules /tmp/dgryski/semgrep-go/rules.go ./...
+          /home/runner/go/bin/ruleguard -c 1 -rules /tmp/dgryski/semgrep-go/rules.go ./...
 
