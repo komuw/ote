@@ -104,9 +104,11 @@ jobs:
           wget -nc --directory-prefix=/tmp https://github.com/myitcv/gobin/releases/download/$GOBIN_VERSION/linux-amd64
           mv /tmp/linux-amd64 /tmp/gobin
           chmod +x /tmp/gobin
-          /tmp/gobin honnef.co/go/tools/cmd/staticcheck@$STATICCHECK_VERSION
-          /tmp/gobin github.com/securego/gosec/cmd/gosec
-          /tmp/gobin github.com/quasilyte/go-ruleguard/cmd/ruleguard
+          /tmp/gobin -u honnef.co/go/tools/cmd/staticcheck@$STATICCHECK_VERSION
+          /tmp/gobin -u github.com/securego/gosec/cmd/gosec
+          /tmp/gobin -u github.com/quasilyte/go-ruleguard/cmd/ruleguard
+          /tmp/gobin -u github.com/orijtech/structslop/cmd/structslop
+          /tmp/gobin -u github.com/orijtech/httperroryzer/cmd/httperroryzer
         env:
           GOBIN_VERSION: 'v0.0.14'
           STATICCHECK_VERSION: '2020.1.6'
@@ -116,6 +118,8 @@ jobs:
           go vet -v -all ./...
           /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.15 -unused.whole-program ./...
           /home/runner/go/bin/gosec ./...
+          /home/runner/go/bin/structslop ./...
+          /home/runner/go/bin/httperroryzer ./...
 
           mkdir -p /tmp/dgryski/semgrep-go && \
           wget -nc --output-document=/tmp/dgryski/semgrep-go/rules.go https://raw.githubusercontent.com/dgryski/semgrep-go/master/ruleguard.rules.go && \
