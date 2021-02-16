@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sort"
 	"testing"
@@ -238,7 +238,7 @@ require (
 	for _, v := range tt {
 		v := v // capture range variable
 		t.Run(fmt.Sprintf("runing test for modFilePath: %s", v.modFilePath), func(t *testing.T) {
-			originalMod, err := ioutil.ReadFile(v.modFilePath)
+			originalMod, err := os.ReadFile(v.modFilePath)
 			if err != nil {
 				t.Fatal(err)
 			}
