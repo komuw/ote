@@ -135,6 +135,8 @@ jobs:
           find . -name "*.go" | xargs -n 1 sed -i '' 's/sync.Mutex/deadlock.Mutex/'
           goimports -w .
           go test -timeout 1m -v -race ./...
+          
+          # TODO: add https://github.com/system-pclub/GCatch
 
       - name: stress test
         run: |
