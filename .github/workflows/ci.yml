@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 2
     strategy:
       matrix:
-        go-version: [1.15]
+        go-version: [1.16]
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -50,14 +50,14 @@ jobs:
     timeout-minutes: 3
     strategy:
       matrix:
-        go-version: [1.15]
+        go-version: [1.16]
         platform: [ubuntu-18.04, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.15
+          go-version: 1.16
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
@@ -81,14 +81,14 @@ jobs:
     timeout-minutes: 2
     strategy:
       matrix:
-        go-version: [1.15]
+        go-version: [1.16]
         platform: [ubuntu-18.04]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.15
+          go-version: 1.16
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
@@ -118,7 +118,7 @@ jobs:
         run: |
           diff <(gofmt -d .) <(printf "")
           go vet -v -all ./...
-          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.15 -unused.whole-program ./...
+          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.16 -unused.whole-program ./...
           /home/runner/go/bin/gosec ./...
           /home/runner/go/bin/structslop ./...
           /home/runner/go/bin/httperroryzer ./...
