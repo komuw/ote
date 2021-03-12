@@ -101,13 +101,13 @@ jobs:
 
       - name: install tools
         run: |
-          go install honnef.co/go/tools/cmd/staticcheck@latest
-          go install github.com/securego/gosec/cmd/gosec@latest
-          go install github.com/quasilyte/go-ruleguard/cmd/ruleguard@latest
-          go install github.com/orijtech/structslop/cmd/structslop@latest
-          go install github.com/orijtech/httperroryzer/cmd/httperroryzer@latest
-          go install golang.org/x/tools/cmd/stress@latest
-          go install golang.org/x/tools/cmd/goimports@latest
+          go install -v -x honnef.co/go/tools/cmd/staticcheck@latest
+          go install -v -x github.com/securego/gosec/cmd/gosec@latest
+          go install -v -x github.com/quasilyte/go-ruleguard/cmd/ruleguard@latest
+          go install -v -x github.com/orijtech/structslop/cmd/structslop@latest
+          go install -v -x github.com/orijtech/httperroryzer/cmd/httperroryzer@latest
+          go install -v -x golang.org/x/tools/cmd/stress@latest
+          go install -v -x golang.org/x/tools/cmd/goimports@latest
 
           which staticcheck
           which structslop
