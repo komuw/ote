@@ -129,7 +129,7 @@ jobs:
 
           # deadlock detection
           # https://github.com/cockroachdb/cockroach/issues/7972
-          go get github.com/sasha-s/go-deadlock/...
+          go get github.com/sasha-s/go-deadlock
           find . -name "*.go" | xargs -n 1 sed -i '' 's/sync.RWMutex/deadlock.RWMutex/'
           find . -name "*.go" | xargs -n 1 sed -i '' 's/sync.Mutex/deadlock.Mutex/'
           goimports -w .
