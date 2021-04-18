@@ -137,11 +137,13 @@ jobs:
           # deadlock detection
           # https://github.com/cockroachdb/cockroach/issues/7972
           go get github.com/sasha-s/go-deadlock
-          find . -name "*.go" | xargs -n 1 sed -i '' 's/sync.RWMutex/deadlock.RWMutex/'
-          find . -name "*.go" | xargs -n 1 sed -i '' 's/sync.Mutex/deadlock.Mutex/'
+          find . -name "*.go" | xargs -n 1 sed -i.backup 's/sync.RWMutex/deadlock.RWMutex/'
+          find . -name "*.go" | xargs -n 1 sed -i.backup 's/sync.Mutex/deadlock.Mutex/'
+          find . -name '*.backup' -delete
           goimports -w .
           go test -timeout 1m -v -race ./...
-          
+          go mod tidy
+
           # TODO: add https://github.com/system-pclub/GCatch
 
       - name: stress test
