@@ -128,9 +128,11 @@ jobs:
           /home/runner/go/bin/httperroryzer ./...
           /home/runner/go/bin/golangci-lint run --no-config --enable=bodyclose,exhaustive,exhaustivestruct,exportloopref,gochecknoglobals,tparallel,unparam,wrapcheck ./...
 
-          mkdir -p /tmp/dgryski/semgrep-go && \
-          wget -nc --output-document=/tmp/dgryski/semgrep-go/rules.go https://raw.githubusercontent.com/dgryski/semgrep-go/master/ruleguard.rules.go && \
+          mkdir -p /tmp/dgryski/semgrep-go
+          wget -nc --output-document=/tmp/dgryski/semgrep-go/rules.go https://raw.githubusercontent.com/dgryski/semgrep-go/master/ruleguard.rules.go
+          go get github.com/quasilyte/go-ruleguard/dsl
           /home/runner/go/bin/ruleguard -c 1 -rules /tmp/dgryski/semgrep-go/rules.go ./...
+          go mod tidy
 
           # deadlock detection
           # https://github.com/cockroachdb/cockroach/issues/7972
