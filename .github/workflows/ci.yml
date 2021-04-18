@@ -101,6 +101,7 @@ jobs:
 
       - name: install tools
         run: |
+          set -x
           go version
           go install honnef.co/go/tools/cmd/staticcheck@latest
           go install github.com/securego/gosec/cmd/gosec@latest
@@ -110,8 +111,7 @@ jobs:
           go install golang.org/x/tools/cmd/stress@latest
           go install golang.org/x/tools/cmd/goimports@latest
 
-          which staticcheck
-          which structslop
+          /home/runner/go/bin/staticcheck -version
         env:
           SOME_ENV_VAR: '2020.1.6'
 
