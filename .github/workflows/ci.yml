@@ -111,6 +111,7 @@ jobs:
           go install golang.org/x/tools/cmd/stress@latest
           go install golang.org/x/tools/cmd/goimports@latest
           go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
           /home/runner/go/bin/staticcheck -version
         env:
@@ -125,6 +126,7 @@ jobs:
           /home/runner/go/bin/gosec ./...
           /home/runner/go/bin/structslop ./...
           /home/runner/go/bin/httperroryzer ./...
+          /home/runner/go/bin/golangci-lint run --no-config --enable=bodyclose,exhaustive,exhaustivestruct,exportloopref,gochecknoglobals,tparallel,unparam,wrapcheck ./...
 
           mkdir -p /tmp/dgryski/semgrep-go && \
           wget -nc --output-document=/tmp/dgryski/semgrep-go/rules.go https://raw.githubusercontent.com/dgryski/semgrep-go/master/ruleguard.rules.go && \
