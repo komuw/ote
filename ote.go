@@ -411,16 +411,11 @@ func walkDirFn(path string, d fs.DirEntry, err error) error {
 		return nil
 	}
 
-	fmt.Println("path: ", path)
-	fmt.Println("fName: ", fName)
-	fmt.Println("err: ", err)
-
 	impPaths, errF := fetchImports(path)
 	if errF != nil {
 		return errF
 	}
 	if strings.Contains(fName, "_test.go") {
-		fmt.Println("TEST FILE: ", fName)
 		testImportPaths = append(testImportPaths, impPaths...)
 	} else {
 		nonTestImportPaths = append(nonTestImportPaths, impPaths...)
@@ -460,10 +455,6 @@ func fetchImports(file string) ([]string, error) {
 			}
 		}
 	}
-
-	// fmt.Println(f.Name, f.Imports)
-	// litter.Dump(f.Imports)
-	// fmt.Println("impPaths: ", impPaths)
 
 	return impPaths, nil
 }
