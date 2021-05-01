@@ -485,7 +485,6 @@ func isStdLibPkg(pkg string) bool {
 // Usage:
 //     fetchModule("/Users/komuw/mystuff/ote/testdata/mod2/", "github.com/hashicorp/nomad/drivers/shared/executor")
 func fetchModule(root, importPath string) (string, error) {
-	log.Printf("fetchModule root: %v  importPath: %v", root, importPath)
 	cfg := &packages.Config{
 		Mode:  packages.NeedModule,
 		Tests: false,
