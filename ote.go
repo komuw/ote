@@ -349,8 +349,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"path/filepath"
+
+	"golang.org/x/mod/modfile"
 )
 
 // TODO: better errors
@@ -385,4 +389,40 @@ func main() {
 
 	trueTestModules := difference(testModules, nonTestModules)
 	fmt.Println("trueTestModules: ", trueTestModules)
+}
+
+func getModFile(gomodFile string) (*modfile.File, error) {
+	modContents, err := os.ReadFile(filepath.Clean(gomodFile))
+	if err != nil {
+		return nil, err
+	}
+	f, err := modfile.Parse(gomodFile, modContents, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return f, nil
+}
+
+func run(fp string, w io.Writer, readonly bool) error {
+	gomodFile := filepath.Join(fp, "go.mod")
+
+	f, err := getModFile(gomodFile)
+	if err != nil {
+		return err
+	}
+	_ = f
+
+	// testRequires := getTestDeps(modulePaths, allDeps)
+	// err = updateMod(testRequires, f)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// err = writeMod(f, gomodFile, w, readonly)
+	// if err != nil {
+	// 	return err
+	// }
+
+	return nil
 }
