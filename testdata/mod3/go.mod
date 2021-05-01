@@ -1,6 +1,6 @@
 module testdata/mod3
 
-go 1.14
+go 1.16
 
 // ote should remove the //test comment from go-cmp since it is also used in main.go
 // it should also add a //test comment to testify

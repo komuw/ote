@@ -111,7 +111,7 @@ func TestRun(t *testing.T) {
 			modFilePath: "go.mod",
 			expectedModfile: []byte(`module github.com/komuw/ote
 
-go 1.14
+go 1.16
 
 require (
 	github.com/google/go-cmp v0.5.2 // test
@@ -122,7 +122,7 @@ require (
 `),
 			expectedModifiedModfile: []byte(`module github.com/komuw/ote
 
-go 1.14
+go 1.16
 
 require (
 	github.com/google/go-cmp v0.5.2 // test
@@ -139,7 +139,7 @@ require (
 			modFilePath: "testdata/mod1/go.mod",
 			expectedModfile: []byte(`module testdata/mod1
 
-go 1.14
+go 1.16
 
 require (
 	github.com/Shopify/sarama v1.27.0
@@ -154,7 +154,7 @@ require (
 `),
 			expectedModifiedModfile: []byte(`module testdata/mod1
 
-go 1.14
+go 1.16
 
 require (
 	github.com/Shopify/sarama v1.27.0
@@ -175,7 +175,7 @@ require (
 			modFilePath: "testdata/mod3/go.mod",
 			expectedModfile: []byte(`module testdata/mod3
 
-go 1.14
+go 1.16
 
 // ote should remove the //test comment from go-cmp since it is also used in main.go
 // it should also add a //test comment to testify
@@ -187,7 +187,7 @@ require (
 `),
 			expectedModifiedModfile: []byte(`module testdata/mod3
 
-go 1.14
+go 1.16
 
 // ote should remove the //test comment from go-cmp since it is also used in main.go
 // it should also add a //test comment to testify
