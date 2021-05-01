@@ -386,11 +386,6 @@ func main() {
 	}
 	fmt.Println("testModules: ", testModules)
 	fmt.Println("nonTestModules: ", nonTestModules)
-
-	dedupedTestModules := dedupe(testModules)
-	dedupedNonTestModules := dedupe(nonTestModules)
-	fmt.Println("dedupedTestModules: ", dedupedTestModules)
-	fmt.Println("dedupedNonTestModules: ", dedupedNonTestModules)
 }
 
 func walkDirFn(path string, d fs.DirEntry, err error) error {
@@ -539,5 +534,5 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 		nonTestModules = append(nonTestModules, m)
 	}
 
-	return testModules, nonTestModules, nil
+	return dedupe(testModules), dedupe(nonTestModules), nil
 }
