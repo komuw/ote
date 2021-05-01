@@ -13,6 +13,33 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
+var stdLibPkgs = make(map[string]struct{})
+
+func loadStd() error {
+	pkgs, err := packages.Load(nil, "std")
+	if err != nil {
+		return err
+	}
+	for _, p := range pkgs {
+		stdLibPkgs[p.PkgPath] = struct{}{}
+	}
+	return nil
+}
+
+func isStdLibPkg(pkg string) bool {
+	_, ok := stdLibPkgs[pkg]
+	return ok
+}
+
+var (
+	//TODO: turn into
+	// type importPaths string
+	// testImportPaths    = []importPaths{}
+
+	testImportPaths    = []string{}
+	nonTestImportPaths = []string{}
+)
+
 func walkDirFn(path string, d fs.DirEntry, err error) error {
 	if err != nil {
 		return err
@@ -44,18 +71,8 @@ func walkDirFn(path string, d fs.DirEntry, err error) error {
 	return nil
 }
 
-var (
-	//TODO: turn into
-	// type importPaths string
-	// testImportPaths    = []importPaths{}
-
-	testImportPaths    = []string{}
-	nonTestImportPaths = []string{}
-)
-
 func fetchImports(file string) ([]string, error) {
 	fset := token.NewFileSet()
-	// file := "/Users/komuw/mystuff/ote/testdata/mod2/main.go"
 	var src interface{} = nil
 	mode := parser.ImportsOnly
 	f, err := parser.ParseFile(fset, file, src, mode)
@@ -77,24 +94,6 @@ func fetchImports(file string) ([]string, error) {
 	}
 
 	return impPaths, nil
-}
-
-var stdLibPkgs = make(map[string]struct{})
-
-func loadStd() error {
-	pkgs, err := packages.Load(nil, "std")
-	if err != nil {
-		return err
-	}
-	for _, p := range pkgs {
-		stdLibPkgs[p.PkgPath] = struct{}{}
-	}
-	return nil
-}
-
-func isStdLibPkg(pkg string) bool {
-	_, ok := stdLibPkgs[pkg]
-	return ok
 }
 
 //

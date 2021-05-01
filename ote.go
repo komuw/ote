@@ -348,6 +348,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -389,10 +390,14 @@ func main() {
 	fmt.Println("trueTestModules: ", trueTestModules)
 
 	f := root
+
+	//////////////////////////////////////////////////////////////
+	// f, r := cli()
 	errRun := run(f, os.Stdout, true)
 	if errRun != nil {
 		log.Fatal("errRun: ", errRun)
 	}
+	//////////////////////////////////////////////////////////////
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
@@ -420,4 +425,42 @@ func run(fp string, w io.Writer, readonly bool) error {
 	}
 
 	return nil
+}
+
+func cli() (string, bool) {
+	var f string
+	var r bool
+
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(),
+			`ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
+Usage:
+-f string
+	path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
+-r	
+        (readonly) write to stdout instead of updating go.mod file.
+examples:
+	ote .
+		update go.mod in the current directory
+	ote -f /tmp/myPkg
+		update go.mod in the /tmp/myPkg directory
+	ote -r
+		(readonly) write to stdout instead of updating go.mod file.
+	ote -f /tmp/myPkg -r
+	        (readonly) write to stdout instead of updating go.mod file in the /tmp/myPkg directory.
+	`)
+	}
+	flag.StringVar(
+		&f,
+		"f",
+		".",
+		"path to directory containing the go.mod file. By default, it uses the current directory.")
+	flag.BoolVar(
+		&r,
+		"r",
+		false,
+		"(readonly) display how the updated go.mod file would look like, without actually updating the file.")
+	flag.Parse()
+
+	return f, r
 }
