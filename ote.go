@@ -353,8 +353,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-
-	"golang.org/x/mod/modfile"
 )
 
 // TODO: better errors
@@ -389,19 +387,12 @@ func main() {
 
 	trueTestModules := difference(testModules, nonTestModules)
 	fmt.Println("trueTestModules: ", trueTestModules)
-}
 
-func getModFile(gomodFile string) (*modfile.File, error) {
-	modContents, err := os.ReadFile(filepath.Clean(gomodFile))
-	if err != nil {
-		return nil, err
+	f := root
+	errRun := run(f, os.Stdout, true)
+	if errRun != nil {
+		log.Fatal("errRun: ", errRun)
 	}
-	f, err := modfile.Parse(gomodFile, modContents, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return f, nil
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
@@ -414,15 +405,19 @@ func run(fp string, w io.Writer, readonly bool) error {
 	_ = f
 
 	// testRequires := getTestDeps(modulePaths, allDeps)
-	// err = updateMod(testRequires, f)
-	// if err != nil {
-	// 	return err
-	// }
 
-	// err = writeMod(f, gomodFile, w, readonly)
-	// if err != nil {
-	// 	return err
-	// }
+	trueTestModules := []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"}
+	err = updateMod(trueTestModules, f)
+	if err != nil {
+		return err
+	}
+
+	// litter.Dump(f)
+
+	err = writeMod(f, gomodFile, w, readonly)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
