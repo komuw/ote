@@ -359,65 +359,34 @@ import (
 // TODO: better errors
 
 func main() {
+	f, r := cli()
+
+	err := run(f, os.Stdout, r)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run(fp string, w io.Writer, readonly bool) error {
 	err := loadStd()
 	if err != nil {
 		log.Fatal("unable to load Stdlibs: ", err)
 	}
 
-	root := "/Users/komuw/mystuff/ote/testdata/mod2/"
-	errWalk := filepath.WalkDir(
-		// note: WalkDir reads an entire directory into memory before proceeding to walk that directory.
-		// see documentation of filepath.WalkDir
-		root,
-		walkDirFn,
-	)
-	if errWalk != nil {
-		log.Fatal("filepath.WalkDir err: ", errWalk)
-	}
-
-	fmt.Println("testImportPaths: ", testImportPaths)
-	fmt.Println("nonTestImportPaths: ", nonTestImportPaths)
-
-	fmt.Println()
-	testModules, nonTestModules, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
-	if err != nil {
-		log.Fatal("getAllmodules err: ", err)
-	}
-	fmt.Println("testModules: ", testModules)
-	fmt.Println("nonTestModules: ", nonTestModules)
-
-	trueTestModules := difference(testModules, nonTestModules)
-	fmt.Println("trueTestModules: ", trueTestModules)
-
-	f := root
-
-	//////////////////////////////////////////////////////////////
-	// f, r := cli()
-	errRun := run(f, os.Stdout, true)
-	if errRun != nil {
-		log.Fatal("errRun: ", errRun)
-	}
-	//////////////////////////////////////////////////////////////
-}
-
-func run(fp string, w io.Writer, readonly bool) error {
 	gomodFile := filepath.Join(fp, "go.mod")
-
 	f, err := getModFile(gomodFile)
 	if err != nil {
 		return err
 	}
-	_ = f
 
-	// testRequires := getTestDeps(modulePaths, allDeps)
-
-	trueTestModules := []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"}
+	trueTestModules, err := getTestModules(fp)
+	if err != nil {
+		return err
+	}
 	err = updateMod(trueTestModules, f)
 	if err != nil {
 		return err
 	}
-
-	// litter.Dump(f)
 
 	err = writeMod(f, gomodFile, w, readonly)
 	if err != nil {
@@ -426,6 +395,10 @@ func run(fp string, w io.Writer, readonly bool) error {
 
 	return nil
 }
+
+// TODO: remove this:
+// Usage:
+//   go run . -f testdata/mod2/ -r
 
 func cli() (string, bool) {
 	var f string

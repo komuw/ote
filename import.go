@@ -158,3 +158,27 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 
 	return dedupe(testModules), dedupe(nonTestModules), nil
 }
+
+func getTestModules(root string) ([]string, error) {
+	err := filepath.WalkDir(
+		// note: WalkDir reads an entire directory into memory before proceeding to walk that directory.
+		// see documentation of filepath.WalkDir
+		root,
+		walkDirFn,
+	)
+	if err != nil {
+		return []string{}, err
+	}
+
+	testModules, nonTestModules, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
+	if err != nil {
+		return []string{}, err
+	}
+	fmt.Println("testModules: ", testModules)
+	fmt.Println("nonTestModules: ", nonTestModules)
+
+	trueTestModules := difference(testModules, nonTestModules)
+	fmt.Println("trueTestModules: ", trueTestModules)
+
+	return trueTestModules, nil
+}
