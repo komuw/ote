@@ -359,36 +359,11 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func dirFilter(f fs.FileInfo) bool { return true }
-
 func main() {
 	err := loadStd()
 	if err != nil {
 		log.Fatal("unable to load Stdlibs: ", err)
 	}
-
-	// fset := token.NewFileSet()
-	// path := "/Users/komuw/mystuff/ote/testdata/mod2/versionss"
-	// mode := parser.ImportsOnly
-	// pkgs, firstErr := parser.ParseDir(fset, path, dirFilter, mode)
-
-	// if firstErr != nil {
-	// 	log.Fatal("firstError: ", firstErr)
-	// }
-
-	// fmt.Println("pkgs: \n")
-	// fmt.Println(pkgs)
-
-	// for k, v := range pkgs {
-
-	// 	litter.Dump(k, v.Name)
-	// 	// fmt.Println(k, v.Name, v.Imports)
-
-	// 	for a, b := range v.Imports {
-
-	// 		litter.Dump(a, b.Name, b.Kind)
-	// 	}
-	// }
 
 	root := "/Users/komuw/mystuff/ote/testdata/mod2/"
 	errWalkDir := filepath.WalkDir(root, walkDirFn)
