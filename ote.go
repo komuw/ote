@@ -366,18 +366,26 @@ func main() {
 	}
 
 	root := "/Users/komuw/mystuff/ote/testdata/mod2/"
-	errWalkDir := filepath.WalkDir(
+	errWalk := filepath.WalkDir(
 		// note: WalkDir reads an entire directory into memory before proceeding to walk that directory.
 		// see documentation of filepath.WalkDir
 		root,
 		walkDirFn,
 	)
-	if errWalkDir != nil {
-		log.Fatal("filepath.WalkDir err: ", errWalkDir)
+	if errWalk != nil {
+		log.Fatal("filepath.WalkDir err: ", errWalk)
 	}
 
 	fmt.Println("testImportPaths: ", testImportPaths)
 	fmt.Println("nonTestImportPaths: ", nonTestImportPaths)
+
+	fmt.Println()
+	testModules, nonTestModules, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
+	if err != nil {
+		log.Fatal("getAllmodules err: ", err)
+	}
+	fmt.Println("testModules: ", testModules)
+	fmt.Println("nonTestModules: ", nonTestModules)
 }
 
 func walkDirFn(path string, d fs.DirEntry, err error) error {
@@ -417,6 +425,10 @@ func walkDirFn(path string, d fs.DirEntry, err error) error {
 }
 
 var (
+	//TODO: turn into
+	// type importPaths string
+	// testImportPaths    = []importPaths{}
+
 	testImportPaths    = []string{}
 	nonTestImportPaths = []string{}
 )
@@ -467,4 +479,61 @@ func loadStd() error {
 func isStdLibPkg(pkg string) bool {
 	_, ok := stdLibPkgs[pkg]
 	return ok
+}
+
+//
+// Usage:
+//     fetchModule("/Users/komuw/mystuff/ote/testdata/mod2/", "github.com/hashicorp/nomad/drivers/shared/executor")
+func fetchModule(root, importPath string) (string, error) {
+	log.Printf("fetchModule root: %v  importPath: %v", root, importPath)
+	cfg := &packages.Config{
+		Mode:  packages.NeedModule,
+		Tests: false,
+		// BuildFlags: []string{fmt.Sprintf("-tags=%s", buildFlags)},
+		Dir: filepath.Dir(root),
+	}
+	pkgs, err := packages.Load(
+		cfg,
+		fmt.Sprintf("pattern=%s", importPath),
+	)
+	if err != nil {
+		return "", err
+	}
+
+	if len(pkgs) > 1 {
+		return "", fmt.Errorf("import %s produced greater than 1 packages", importPath)
+	}
+	if len(pkgs) < 0 {
+		return "", fmt.Errorf("import %s does not belong to any package", importPath)
+	}
+
+	pkg := pkgs[0]
+	if pkg.Module == nil {
+		return "", fmt.Errorf("import %s does not belong to any module", importPath)
+	}
+
+	return pkg.Module.Path, nil
+}
+
+func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
+	// testModules := []string{}
+	// nonTestModules := []string{}
+
+	for _, v := range testImportPaths {
+		m, err := fetchModule(root, v)
+		if err != nil {
+			return testModules, nonTestModules, err
+		}
+		testModules = append(testModules, m)
+	}
+
+	for _, v := range nonTestImportPaths {
+		m, err := fetchModule(root, v)
+		if err != nil {
+			return testModules, nonTestModules, err
+		}
+		nonTestModules = append(nonTestModules, m)
+	}
+
+	return testModules, nonTestModules, nil
 }
