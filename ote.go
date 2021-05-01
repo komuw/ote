@@ -359,6 +359,8 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
+// TODO: better errors
+
 func main() {
 	err := loadStd()
 	if err != nil {
