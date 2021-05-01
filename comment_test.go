@@ -3,8 +3,9 @@ package main
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"golang.org/x/mod/modfile"
+
+	qt "github.com/frankban/quicktest"
 )
 
 func TestIsTest(t *testing.T) {
@@ -55,10 +56,8 @@ func TestIsTest(t *testing.T) {
 		v := v // capture range variable
 		res := isTest(v.line)
 
-		if !cmp.Equal(res, v.expected) {
-			t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", v, v.expected)
-		}
-
+		c := qt.New(t)
+		c.Assert(res, qt.Equals, v.expected)
 	}
 
 }
@@ -157,8 +156,7 @@ func TestSetTest(t *testing.T) {
 			token = v.line.Comments.Suffix[0].Token
 		}
 
-		if !cmp.Equal(token, v.expected) {
-			t.Errorf("\ngot \n\t%#+v \nwanted \n\t%#+v", token, v.expected)
-		}
+		c := qt.New(t)
+		c.Assert(token, qt.Equals, v.expected)
 	}
 }
