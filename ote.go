@@ -366,7 +366,12 @@ func main() {
 	}
 
 	root := "/Users/komuw/mystuff/ote/testdata/mod2/"
-	errWalkDir := filepath.WalkDir(root, walkDirFn)
+	errWalkDir := filepath.WalkDir(
+		// note: WalkDir reads an entire directory into memory before proceeding to walk that directory.
+		// see documentation of filepath.WalkDir
+		root,
+		walkDirFn,
+	)
 	if errWalkDir != nil {
 		log.Fatal("filepath.WalkDir err: ", errWalkDir)
 	}
@@ -411,8 +416,10 @@ func walkDirFn(path string, d fs.DirEntry, err error) error {
 	return nil
 }
 
-var testImportPaths = []string{}
-var nonTestImportPaths = []string{}
+var (
+	testImportPaths    = []string{}
+	nonTestImportPaths = []string{}
+)
 
 func fetchImports(file string) ([]string, error) {
 	fset := token.NewFileSet()
