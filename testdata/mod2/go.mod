@@ -14,6 +14,6 @@ require (
 	github.com/shirou/gopsutil v2.20.9+incompatible
 	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/net v0.0.0-20210501142056-aec3718b3fa0 // indirect
-	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887 // indirect
+	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887
 	rsc.io/quote v1.5.2
 )
