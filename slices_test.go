@@ -41,10 +41,40 @@ func Test_difference(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			c := qt.New(t)
 			got := difference(tt.testModules, tt.nonTestModules)
 			c.Assert(got, qt.DeepEquals, tt.trueTestModules)
+		})
+	}
+}
+
+func Test_dedupe(t *testing.T) {
+	tests := []struct {
+		name string
+		in   []string
+		want []string
+	}{
+		{
+			name: "empty slice",
+			in:   []string{},
+			want: []string{},
+		},
+		{
+			name: "small slice",
+			in:   []string{"a", "a"},
+			want: []string{"a", "a"},
+		},
+		{
+			name: "large slice",
+			in:   []string{"a", "a", "b", "a"},
+			want: []string{"a", "b"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := qt.New(t)
+			got := dedupe(tt.in)
+			c.Assert(got, qt.DeepEquals, tt.want)
 		})
 	}
 }
