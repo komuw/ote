@@ -114,7 +114,7 @@ func TestRun(t *testing.T) {
 go 1.16
 
 require (
-	github.com/google/go-cmp v0.5.2 // test
+	github.com/google/go-cmp v0.5.5 // test
 	github.com/kylelemons/godebug v1.1.0 // test
 	golang.org/x/mod v0.3.0
 	golang.org/x/tools v0.0.0-20201012192620-5bd05386311b
@@ -125,7 +125,7 @@ require (
 go 1.16
 
 require (
-	github.com/google/go-cmp v0.5.2 // test
+	github.com/google/go-cmp v0.5.5 // test
 	github.com/kylelemons/godebug v1.1.0 // test
 	golang.org/x/mod v0.3.0
 	golang.org/x/tools v0.0.0-20201012192620-5bd05386311b
@@ -209,7 +209,7 @@ go 1.15
 
 require (
 	github.com/golang/protobuf v1.4.2 // indirect
-	github.com/google/go-cmp v0.5.2
+	github.com/google/go-cmp v0.5.5
 	github.com/komuw/kama v0.0.0-20201012123531-9c57efc1ae36
 	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
 	github.com/nats-io/nats.go v1.10.0
@@ -223,7 +223,7 @@ go 1.15
 
 require (
 	github.com/golang/protobuf v1.4.2 // indirect
-	github.com/google/go-cmp v0.5.2 // test
+	github.com/google/go-cmp v0.5.5 // test
 	github.com/komuw/kama v0.0.0-20201012123531-9c57efc1ae36 // test
 	github.com/nats-io/nats-server/v2 v2.1.8 // indirect
 	github.com/nats-io/nats.go v1.10.0
