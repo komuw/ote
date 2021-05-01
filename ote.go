@@ -386,6 +386,9 @@ func main() {
 	}
 	fmt.Println("testModules: ", testModules)
 	fmt.Println("nonTestModules: ", nonTestModules)
+
+	trueTestModules := difference(testModules, nonTestModules)
+	fmt.Println("trueTestModules: ", trueTestModules)
 }
 
 func walkDirFn(path string, d fs.DirEntry, err error) error {
