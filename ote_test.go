@@ -116,8 +116,9 @@ go 1.16
 require (
 	github.com/google/go-cmp v0.5.5 // test
 	github.com/kylelemons/godebug v1.1.0 // test
-	golang.org/x/mod v0.3.0
-	golang.org/x/tools v0.0.0-20201012192620-5bd05386311b
+	golang.org/x/mod v0.4.2
+	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887 // indirect
+	golang.org/x/tools v0.1.0
 )
 `),
 			expectedModifiedModfile: []byte(`module github.com/komuw/ote
@@ -127,8 +128,9 @@ go 1.16
 require (
 	github.com/google/go-cmp v0.5.5 // test
 	github.com/kylelemons/godebug v1.1.0 // test
-	golang.org/x/mod v0.3.0
-	golang.org/x/tools v0.0.0-20201012192620-5bd05386311b
+	golang.org/x/mod v0.4.2
+	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887 // indirect
+	golang.org/x/tools v0.1.0
 )
 
 `),
@@ -205,7 +207,7 @@ require (
 			modFilePath: "testdata/mod5/go.mod",
 			expectedModfile: []byte(`module testdata/mod5
 
-go 1.15
+go 1.16
 
 require (
 	github.com/golang/protobuf v1.4.2 // indirect
@@ -219,7 +221,7 @@ require (
 `),
 			expectedModifiedModfile: []byte(`module testdata/mod5
 
-go 1.15
+go 1.16
 
 require (
 	github.com/golang/protobuf v1.4.2 // indirect
