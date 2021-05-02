@@ -60,9 +60,14 @@ func Test_dedupe(t *testing.T) {
 			want: []string{},
 		},
 		{
+			name: "nil slice",
+			in:   nil,
+			want: nil,
+		},
+		{
 			name: "small slice",
 			in:   []string{"a", "a"},
-			want: []string{"a", "a"},
+			want: []string{"a"},
 		},
 		{
 			name: "large slice",

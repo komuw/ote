@@ -1,10 +1,7 @@
 package main
 
 func dedupe(in []string) []string {
-	if len(in) <= 0 {
-		return in
-	} else if len(in) <= 3 {
-		// deduping a small slice is probably wasteful
+	if len(in) <= 1 {
 		return in
 	}
 
