@@ -118,6 +118,15 @@ func Test_getAllmodules(t *testing.T) {
 			wantTestModules:    []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil", "rsc.io/quote"},
 			wantNonTestModules: []string{"github.com/hashicorp/nomad", "github.com/pkg/errors", "golang.org/x/sys", "rsc.io/quote", "testdata/mod2", "github.com/LK4D4/joincontext"},
 		},
+
+		{
+			name:               "with duplicates",
+			testImportPaths:    []string{"rsc.io/quote", "github.com/frankban/quicktest", "rsc.io/quote", "github.com/shirou/gopsutil/mem", "rsc.io/quote"},
+			nonTestImportPaths: []string{"github.com/hashicorp/nomad/drivers/shared/executor", "github.com/pkg/errors", "golang.org/x/sys/windows", "rsc.io/quote", "testdata/mod2/api", "testdata/mod2/version", "github.com/LK4D4/joincontext"},
+			root:               "testdata/mod2",
+			wantTestModules:    []string{"rsc.io/quote", "github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+			wantNonTestModules: []string{"github.com/hashicorp/nomad", "github.com/pkg/errors", "golang.org/x/sys", "rsc.io/quote", "testdata/mod2", "github.com/LK4D4/joincontext"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
