@@ -19,7 +19,9 @@ const goosList = "aix android darwin dragonfly freebsd hurd illumos ios js linux
 const goarchList = "386 amd64 amd64p32 arm armbe arm64 arm64be ppc64 ppc64le mips mipsle mips64 mips64le mips64p32 mips64p32le ppc riscv riscv64 s390 s390x sparc sparc64 wasm "
 const cGo = "cgo"
 
-var stdLibPkgs = make(map[string]struct{})
+var stdLibPkgs = map[string]struct{}{
+	"C": {}, // cGo. see: https://blog.golang.org/cgo
+}
 
 func loadStd() error {
 	pkgs, err := packages.Load(nil, "std")
