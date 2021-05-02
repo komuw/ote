@@ -163,16 +163,16 @@ func Test_getTestModules(t *testing.T) {
 	}{
 		// TODO: undo the comment
 
-		// {
-		// 	name: "root with ending slash",
-		// 	root: "testdata/mod1/",
-		// 	want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
-		// },
-		// {
-		// 	name: "root with NO ending slash",
-		// 	root: "testdata/mod1",
-		// 	want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
-		// },
+		{
+			name: "root with ending slash",
+			root: "testdata/mod1/",
+			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+		},
+		{
+			name: "root with NO ending slash",
+			root: "testdata/mod1",
+			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+		},
 
 		{
 			name: "main module that has nested module inside",
