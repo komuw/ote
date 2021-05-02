@@ -89,6 +89,8 @@ func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) err
 		if err != nil {
 			return err
 		}
+		defer fi.Close()
+
 		_, err = fi.Write(b)
 		fmt.Fprintln(w, "successfully updated go.mod file.")
 		return err
