@@ -42,6 +42,8 @@ var (
 	// type importPaths string
 	// testImportPaths    = []importPaths{}
 
+	// TODO: eliminate this globals.
+	// They make tests fail when ran together.
 	testImportPaths    = []string{}
 	nonTestImportPaths = []string{}
 )
@@ -113,7 +115,7 @@ func fetchModule(root, importPath string) (string, error) {
 		Mode:       packages.NeedModule,
 		Tests:      false,
 		BuildFlags: []string{fmt.Sprintf("-tags=%s", buildFlags)},
-		Dir:        filepath.Dir(root),
+		Dir:        root,
 	}
 	pkgs, err := packages.Load(
 		cfg,
