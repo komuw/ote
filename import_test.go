@@ -39,7 +39,6 @@ func Test_fetchImports(t *testing.T) {
 			file: "testdata/mod2/main.go",
 			want: []string{"fmt", "testdata/mod2/api", "testdata/mod2/version"},
 		},
-
 		{
 			name: "testFile",
 			file: "testdata/mod2/version/ver_test.go",
