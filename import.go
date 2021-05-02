@@ -148,8 +148,6 @@ func fetchModule(root, importPath string) (string, error) {
 }
 
 func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
-	// testModules := []string{}
-	// nonTestModules := []string{}
 
 	for _, v := range testImportPaths {
 		m, err := fetchModule(root, v)
