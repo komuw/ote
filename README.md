@@ -1,7 +1,7 @@
 ## ote          
 
-![ote ci](https://github.com/komuw/ote/workflows/ote%20ci/badge.svg?branch=master)
-[![codecov](https://codecov.io/gh/komuw/ote/branch/master/graph/badge.svg)](https://codecov.io/gh/komuw/ote)
+![ote ci](https://github.com/komuw/ote/workflows/ote%20ci/badge.svg?branch=main)
+[![codecov](https://codecov.io/gh/komuw/ote/branch/main/graph/badge.svg)](https://codecov.io/gh/komuw/ote)
 [![PkgGoDev](https://pkg.go.dev/badge/https://pkg.go.dev/github.com/komuw/ote)](https://pkg.go.dev/github.com/komuw/ote)
 [![Go Report Card](https://goreportcard.com/badge/github.com/komuw/ote)](https://goreportcard.com/report/github.com/komuw/ote)
 
