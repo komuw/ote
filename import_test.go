@@ -53,7 +53,6 @@ func Test_fetchImports(t *testing.T) {
 			loadStd()
 
 			got, err := fetchImports(tt.file)
-			t.Log(got)
 			c.Assert(err, qt.IsNil)
 			c.Assert(got, qt.DeepEquals, tt.want)
 		})
