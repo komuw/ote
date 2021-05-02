@@ -64,13 +64,13 @@ func Test_fetchModule(t *testing.T) {
 		want       string
 	}{
 		{
-			name:       "root with slash",
+			name:       "root with ending slash",
 			root:       "testdata/mod2/",
 			importPath: "github.com/hashicorp/nomad/drivers/shared/executor",
 			want:       "github.com/hashicorp/nomad",
 		},
 		{
-			name:       "root with NO slash",
+			name:       "root with NO ending slash",
 			root:       "testdata/mod2",
 			importPath: "github.com/hashicorp/nomad/drivers/shared/executor",
 			want:       "github.com/hashicorp/nomad",
