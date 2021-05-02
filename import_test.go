@@ -75,6 +75,12 @@ func Test_fetchModule(t *testing.T) {
 			importPath: "github.com/hashicorp/nomad/drivers/shared/executor",
 			want:       "github.com/hashicorp/nomad",
 		},
+		{
+			name:       "short import path",
+			root:       "testdata/mod2/",
+			importPath: "rsc.io/quote",
+			want:       "rsc.io/quote",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
