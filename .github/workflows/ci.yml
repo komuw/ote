@@ -8,7 +8,7 @@ jobs:
 
   check_release_notes:
     name: check_release_notes
-    timeout-minutes: 2
+    timeout-minutes: 1
     strategy:
       matrix:
         go-version: [1.16]
@@ -20,65 +20,48 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
+      - name: checkout main branch too. # so that it is also available for diff operations
+        uses: actions/checkout@v2
+        with:
+          ref: main
 
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
       - name: check if changes have release notes
-        if: github.ref != 'refs/heads/master'
+        if: github.ref != 'refs/heads/main'
         env:
           GIT_BRANCH: ${{ github.ref }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_BASE_REF: ${{ github.base_ref	}}
         run: |
-          if [ "$GIT_BRANCH" == "master" ]
+          printf "GIT_BRANCH: $GIT_BRANCH \n"
+          printf "GITHUB_HEAD_REF: $GITHUB_HEAD_REF \n"
+          printf "GITHUB_BASE_REF: $GITHUB_BASE_REF \n"
+          printf "list git branches: \n"
+          git branch --list --all
+
+          if [[ "$GIT_BRANCH" == "refs/heads/main" ]]
           then
               printf "\n $GIT_BRANCH branch, ignoring check for relese notes \n"
-          elif [ "$GIT_BRANCH" == *"refs/tags/"* ]
+          elif [[  "$GIT_BRANCH" == *"refs/tags/"* ]]
           then
               printf "\n $GIT_BRANCH branch, ignoring check for relese notes \n"
           else
-              ChangedFiles=`git diff --name-only origin/master`
+              ChangedFiles=`git diff --name-only remotes/origin/main`
               echo $ChangedFiles
               case "$ChangedFiles" in
                 *CHANGELOG.*)
-                    printf "\n Thanks, your commits include updates to release notes. \n";;
+                    printf "\n Thanks, your commits include update to release notes. \n";;
                 *)
-                    printf '\n You should add release notes to CHANGELOG.md \n' && exit 77;;
+                    printf "\n You should add release notes to CHANGELOG.md \n" && exit 77;;
               esac
           fi
 
   run_tests:
     name: run_tests
-    timeout-minutes: 3
-    strategy:
-      matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04, macos-latest, windows-latest]
-    runs-on: ${{ matrix.platform }}
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
-
-      - name: tests and benchmarks
-        run: |
-          go test -timeout 1m -race -run=XXXX -bench=. ./...
-          go test -timeout 1m -v -race -cover -coverprofile=coverage.txt ./... && bash <(curl -s https://codecov.io/bash) -v
-          go tool cover -html=coverage.txt -o coverage.html
-          go tool cover -func=coverage.txt
-        if: matrix.platform != 'windows-latest'
-
-      - name: dummy run
-        run: |
-          go build -trimpath --race -o ote .
-          ./ote -h
-          ./ote -f testdata/mod1 -r
-
-  run_analysis:
-    name: run_analysis
-    timeout-minutes: 2
+    timeout-minutes: 7
     strategy:
       matrix:
         go-version: [1.16]
@@ -91,7 +74,49 @@ jobs:
           go-version: 1.16
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+
+      - name: tests and benchmarks
+        run: |
+          go test -timeout 1m -race -run=XXXX -bench=. ./...
+          go test -timeout 4m -v -race ./...
+
+      - name: test coverage
+        run: |
+          set -x
+
+          # check integrity of codecov
+          curl -s https://codecov.io/bash > codecov;
+          VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
+          shasum --algorithm 512 --check <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA512SUM" | grep codecov)
+          rm -rf codecov
+
+          go test -timeout 4m -v -race -cover -coverprofile=coverage.out ./... && bash <(curl -s https://codecov.io/bash)
+          go tool cover -html=coverage.out -o coverage.html
+          go tool cover -func=coverage.out
+
+      - name: dummy run
+        run: |
+          go build -trimpath --race -o ote .
+          ./ote -h
+          ./ote -f testdata/mod1 -r
+
+  run_analysis:
+    name: run_analysis
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        go-version: [1.16]
+        platform: [ubuntu-18.04]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
 
       - name: install apt and pip deps
         run: |
@@ -102,7 +127,6 @@ jobs:
       - name: install tools
         run: |
           set -x
-          go version
           go install honnef.co/go/tools/cmd/staticcheck@latest
           go install github.com/securego/gosec/cmd/gosec@latest
           go install github.com/quasilyte/go-ruleguard/cmd/ruleguard@latest
@@ -119,14 +143,15 @@ jobs:
 
       - name: static analysis
         run: |
+          set -x
           diff <(gofmt -d .) <(printf "")
-          go vet -v -all ./...
+          go vet -all ./...
           go vet -vettool=/home/runner/go/bin/shadow -strict ./...
-          /home/runner/go/bin/staticcheck -tests -show-ignored -go 1.16 ./...
+          /home/runner/go/bin/staticcheck -tests -go 1.16 ./...
           /home/runner/go/bin/gosec ./...
           /home/runner/go/bin/structslop ./...
           /home/runner/go/bin/httperroryzer ./...
-          /home/runner/go/bin/golangci-lint run --no-config --enable=bodyclose,exhaustive,exhaustivestruct,exportloopref,gochecknoglobals,tparallel,unparam,wrapcheck ./...
+          # /home/runner/go/bin/golangci-lint run --no-config --enable=bodyclose,exhaustive,exportloopref,gochecknoglobals,tparallel,unparam,wrapcheck ./...
 
           mkdir -p /tmp/dgryski/semgrep-go
           wget -nc --output-document=/tmp/dgryski/semgrep-go/rules.go https://raw.githubusercontent.com/dgryski/semgrep-go/master/ruleguard.rules.go
@@ -141,8 +166,15 @@ jobs:
           find . -name "*.go" | xargs -n 1 sed -i.backup 's/sync.Mutex/deadlock.Mutex/'
           find . -name '*.backup' -delete
           /home/runner/go/bin/goimports -w .
-          go test -timeout 1m -v -race ./...
+          go test -timeout 4m -v -race ./...
           go mod tidy
+
+          # error shadowing
+          num_err_shadows=$(grep -irSn 'err = ' *.go | wc -l | tr -d ' ')
+          if [ "$num_err_shadows" != "0" ]; then
+              printf "\n\t fix error shadowing \n" && \
+              grep -irSn 'err = ' *.go
+          fi
 
           # TODO: add https://github.com/system-pclub/GCatch
 
