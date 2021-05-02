@@ -104,7 +104,7 @@ func fetchImports(file string) ([]string, error) {
 
 //
 // Usage:
-//     fetchModule("/Users/komuw/mystuff/ote/testdata/mod2/", "github.com/hashicorp/nomad/drivers/shared/executor")
+//     fetchModule("testdata/mod2/", "github.com/hashicorp/nomad/drivers/shared/executor")
 func fetchModule(root, importPath string) (string, error) {
 	buildFlags := (strings.Join(strings.Split(goosList, " "), ",") +
 		strings.Join(strings.Split(goarchList, " "), ",") +
