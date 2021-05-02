@@ -161,14 +161,22 @@ func Test_getTestModules(t *testing.T) {
 		root string
 		want []string
 	}{
+		// TODO: undo the comment
+
+		// {
+		// 	name: "root with ending slash",
+		// 	root: "testdata/mod1/",
+		// 	want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+		// },
+		// {
+		// 	name: "root with NO ending slash",
+		// 	root: "testdata/mod1",
+		// 	want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+		// },
+
 		{
-			name: "root with ending slash",
-			root: "testdata/mod1/",
-			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
-		},
-		{
-			name: "root with NO ending slash",
-			root: "testdata/mod1",
+			name: "main module that has nested module inside",
+			root: "testdata/mod2",
 			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 	}
@@ -185,3 +193,16 @@ func Test_getTestModules(t *testing.T) {
 		})
 	}
 }
+
+// {
+// 	name:       "main module that has nested module inside",
+// 	root:       "testdata/mod2",
+// 	importPath: "github.com/hashicorp/vault/api",
+// 	want:       "github.com/hashicorp/vault/api",
+// },
+// {
+// 	name:       "module that is nested module inside another main",
+// 	root:       "testdata/mod2/nestedModule1",
+// 	importPath: "crawshaw.io/sqlite",
+// 	want:       "crawshaw.io/sqlite",
+// },
