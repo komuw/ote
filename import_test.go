@@ -37,19 +37,23 @@ func Test_fetchImports(t *testing.T) {
 		{
 			name: "nonTestFile",
 			file: "testdata/mod2/main.go",
-			want: []string{"fmt", "testdata/mod2/api", "testdata/mod2/version"},
+			want: []string{"testdata/mod2/api", "testdata/mod2/version"},
 		},
 		{
 			name: "testFile",
 			file: "testdata/mod2/version/ver_test.go",
-			want: []string{"fmt", "testing", "github.com/frankban/quicktest", "github.com/shirou/gopsutil/mem", "rsc.io/quote"},
+			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil/mem", "rsc.io/quote"},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := qt.New(t)
 
+			//  load std libs
+			loadStd()
+
 			got, err := fetchImports(tt.file)
+			t.Log(got)
 			c.Assert(err, qt.IsNil)
 			c.Assert(got, qt.DeepEquals, tt.want)
 		})
@@ -163,6 +167,7 @@ func Test_getTestModules(t *testing.T) {
 
 			//  load std libs
 			loadStd()
+
 			got, err := getTestModules(tt.root)
 			c.Assert(err, qt.IsNil)
 			c.Assert(got, qt.DeepEquals, tt.want)
