@@ -41,6 +41,7 @@ func run(fp string, w io.Writer, readonly bool) error {
 	if err != nil {
 		return err
 	}
+	defer f.Cleanup()
 
 	trueTestModules, err := getTestModules(fp)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	qt "github.com/frankban/quicktest"
+	"golang.org/x/mod/modfile"
 )
 
 func Test_getModFile(t *testing.T) {
@@ -40,6 +41,34 @@ func Test_getModFile(t *testing.T) {
 			got, err := getModFile(tt.gomodFile)
 			c.Assert(err, qt.IsNil)
 			c.Assert(got.Module.Mod.Path, qt.DeepEquals, tt.want)
+		})
+	}
+}
+
+func Test_updateMod(t *testing.T) {
+	f, _ := getModFile("testdata/mod2/go.mod")
+	t.Cleanup(func() {
+		f.Cleanup()
+	})
+
+	tests := []struct {
+		name            string
+		trueTestModules []string
+		f               *modfile.File
+	}{
+		{
+
+			name:            "mod2",
+			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+			f:               f,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := qt.New(t)
+
+			err := updateMod(tt.trueTestModules, tt.f)
+			c.Assert(err, qt.IsNil)
 		})
 	}
 }

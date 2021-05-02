@@ -22,6 +22,7 @@ func getModFile(gomodFile string) (*modfile.File, error) {
 	return f, nil
 }
 
+// updateMod updates the in-memory modfile
 func updateMod(trueTestModules []string, f *modfile.File) error {
 	if len(trueTestModules) < 0 {
 		// if there are no test dependencies, we need to go through all the deps and
@@ -67,6 +68,7 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 	return nil
 }
 
+// writeMod updates the on-disk modfile
 func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
 	f.SortBlocks()
 	f.Cleanup()
