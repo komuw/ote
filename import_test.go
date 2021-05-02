@@ -84,6 +84,18 @@ func Test_fetchModule(t *testing.T) {
 			importPath: "rsc.io/quote",
 			want:       "rsc.io/quote",
 		},
+		{
+			name:       "main module that has nested module inside",
+			root:       "testdata/mod2",
+			importPath: "github.com/hashicorp/vault/api",
+			want:       "github.com/hashicorp/vault/api",
+		},
+		{
+			name:       "module that is nested module inside another main",
+			root:       "testdata/mod2/nestedModule1",
+			importPath: "crawshaw.io/sqlite",
+			want:       "crawshaw.io/sqlite",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
