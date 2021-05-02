@@ -37,48 +37,6 @@ func isStdLibPkg(pkg string) bool {
 	return ok
 }
 
-var (
-	//TODO: turn into
-	// type importPaths string
-	// testImportPaths    = []importPaths{}
-
-	// TODO: eliminate this globals.
-	// They make tests fail when ran together.
-	testImportPaths    = []string{}
-	nonTestImportPaths = []string{}
-)
-
-func walkDirFn(path string, d fs.DirEntry, err error) error {
-	if err != nil {
-		return err
-	}
-
-	if d.IsDir() {
-		// return on directories since we don't want to parse them
-		return nil
-	}
-	if !d.Type().IsRegular() {
-		// non regular files. nothing to parse
-		return nil
-	}
-	fName := d.Name()
-	if filepath.Ext(fName) != ".go" {
-		return nil
-	}
-
-	impPaths, errF := fetchImports(path)
-	if errF != nil {
-		return errF
-	}
-	if strings.Contains(fName, "_test.go") {
-		testImportPaths = append(testImportPaths, impPaths...)
-	} else {
-		nonTestImportPaths = append(nonTestImportPaths, impPaths...)
-	}
-
-	return nil
-}
-
 func fetchImports(file string) ([]string, error) {
 	fset := token.NewFileSet()
 	var src interface{} = nil
@@ -169,11 +127,49 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 }
 
 func getTestModules(root string) ([]string, error) {
+	//TODO: turn into
+	// type importPaths string
+	// testImportPaths    = []importPaths{}
+	testImportPaths := []string{}
+	nonTestImportPaths := []string{}
+
 	err := filepath.WalkDir(
 		// note: WalkDir reads an entire directory into memory before proceeding to walk that directory.
 		// see documentation of filepath.WalkDir
 		root,
-		walkDirFn,
+		func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if d.IsDir() {
+				// return on directories since we don't want to parse them
+				return nil
+			}
+			if !d.Type().IsRegular() {
+				// non regular files. nothing to parse
+				return nil
+			}
+			fName := d.Name()
+			if filepath.Ext(fName) != ".go" {
+				return nil
+			}
+
+			impPaths, errF := fetchImports(path)
+			if errF != nil {
+				return errF
+			}
+			if strings.Contains(fName, "_test.go") {
+				// this takes care of both;
+				// (i) test files
+				// (ii) example files(https://blog.golang.org/examples)
+				testImportPaths = append(testImportPaths, impPaths...)
+			} else {
+				nonTestImportPaths = append(nonTestImportPaths, impPaths...)
+			}
+
+			return nil
+		},
 	)
 	if err != nil {
 		return []string{}, err
@@ -183,11 +179,7 @@ func getTestModules(root string) ([]string, error) {
 	if err != nil {
 		return []string{}, err
 	}
-	fmt.Println("testModules: ", testModules)
-	fmt.Println("nonTestModules: ", nonTestModules)
-
 	trueTestModules := difference(testModules, nonTestModules)
-	fmt.Println("trueTestModules: ", trueTestModules)
 
 	return trueTestModules, nil
 }

@@ -139,3 +139,33 @@ func Test_getAllmodules(t *testing.T) {
 		})
 	}
 }
+
+func Test_getTestModules(t *testing.T) {
+	tests := []struct {
+		name string
+		root string
+		want []string
+	}{
+		{
+			name: "root with ending slash",
+			root: "testdata/mod2/",
+			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+		},
+		{
+			name: "root with NO ending slash",
+			root: "testdata/mod2",
+			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := qt.New(t)
+
+			//  load std libs
+			loadStd()
+			got, err := getTestModules(tt.root)
+			c.Assert(err, qt.IsNil)
+			c.Assert(got, qt.DeepEquals, tt.want)
+		})
+	}
+}
