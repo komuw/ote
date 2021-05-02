@@ -50,9 +50,39 @@ func Test_fetchImports(t *testing.T) {
 			c := qt.New(t)
 
 			got, err := fetchImports(tt.file)
-			t.Log(got)
 			c.Assert(err, qt.IsNil)
 			c.Assert(got, qt.DeepEquals, tt.want)
+		})
+	}
+}
+
+func Test_fetchModule(t *testing.T) {
+	tests := []struct {
+		name       string
+		root       string
+		importPath string
+		want       string
+	}{
+		{
+			name:       "root with slash",
+			root:       "testdata/mod2/",
+			importPath: "github.com/hashicorp/nomad/drivers/shared/executor",
+			want:       "github.com/hashicorp/nomad",
+		},
+		{
+			name:       "root with NO slash",
+			root:       "testdata/mod2",
+			importPath: "github.com/hashicorp/nomad/drivers/shared/executor",
+			want:       "github.com/hashicorp/nomad",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := qt.New(t)
+
+			got, err := fetchModule(tt.root, tt.importPath)
+			c.Assert(err, qt.IsNil)
+			c.Assert(got, qt.Equals, tt.want)
 		})
 	}
 }
