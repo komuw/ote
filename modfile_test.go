@@ -14,25 +14,11 @@ func Test_getModFile(t *testing.T) {
 		gomodFile string
 		want      string
 	}{
-		{
-			name:      "mod1",
-			gomodFile: "testdata/mod1/go.mod",
-			want:      "testdata/mod1",
-		},
+
 		{
 			name:      "mod2",
 			gomodFile: "testdata/mod2/go.mod",
 			want:      "testdata/mod2",
-		},
-		{
-			name:      "mod3",
-			gomodFile: "testdata/mod3/go.mod",
-			want:      "testdata/mod3",
-		},
-		{
-			name:      "mod5",
-			gomodFile: "testdata/mod5/go.mod",
-			want:      "testdata/mod5",
 		},
 	}
 	for _, tt := range tests {
