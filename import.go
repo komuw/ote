@@ -127,12 +127,9 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 }
 
 func getTestModules(root string) ([]string, error) {
-	//TODO: turn into
-	// type importPaths string
-	// testImportPaths    = []importPaths{}
-	testImportPaths := []string{}
-	nonTestImportPaths := []string{}
 
+	allGoFiles := []string{}
+	nonMainModFileDirs := []string{}
 	err := filepath.WalkDir(
 		// note: WalkDir reads an entire directory into memory before proceeding to walk that directory.
 		// see documentation of filepath.WalkDir
@@ -150,16 +147,57 @@ func getTestModules(root string) ([]string, error) {
 				// non regular files. nothing to parse
 				return nil
 			}
+
 			fName := d.Name()
+			if filepath.Ext(fName) == ".mod" {
+				if path != filepath.Join(root, "go.mod") {
+					nonMainModFileDirs = append(nonMainModFileDirs, filepath.Dir(path))
+				}
+			}
 			if filepath.Ext(fName) != ".go" {
 				return nil
 			}
 
+			allGoFiles = append(allGoFiles, path)
+			return nil
+		},
+	)
+	if err != nil {
+		return []string{}, err
+	}
+
+	fetchToAnalyze := func() []string {
+		notToBetAnalzyed := []string{}
+		for _, goFile := range allGoFiles {
+			for _, mod := range nonMainModFileDirs {
+				if strings.Contains(goFile, mod) {
+					// this file should not be analyzed because it belongs
+					// to a nested module
+					notToBetAnalzyed = append(notToBetAnalzyed, goFile)
+				}
+			}
+		}
+
+		tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
+		return tobeAnalyzed
+	}
+
+	tobeAnalyzed := fetchToAnalyze()
+	fetchPaths := func() ([]string, []string, error) {
+		// TODO: turn into
+		// type importPaths string
+		// testImportPaths = []importPaths{}
+
+		testImportPaths := []string{}
+		nonTestImportPaths := []string{}
+
+		for _, path := range tobeAnalyzed {
 			impPaths, errF := fetchImports(path)
 			if errF != nil {
-				return errF
+				return []string{}, []string{}, errF
 			}
-			if strings.Contains(fName, "_test.go") {
+
+			if strings.Contains(path, "_test.go") {
 				// this takes care of both;
 				// (i) test files
 				// (ii) example files(https://blog.golang.org/examples)
@@ -167,10 +205,11 @@ func getTestModules(root string) ([]string, error) {
 			} else {
 				nonTestImportPaths = append(nonTestImportPaths, impPaths...)
 			}
+		}
+		return testImportPaths, nonTestImportPaths, nil
+	}
 
-			return nil
-		},
-	)
+	testImportPaths, nonTestImportPaths, err := fetchPaths()
 	if err != nil {
 		return []string{}, err
 	}

@@ -177,7 +177,7 @@ func Test_getTestModules(t *testing.T) {
 		{
 			name: "main module that has nested module inside",
 			root: "testdata/mod2",
-			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
+			want: []string{"github.com/shirou/gopsutil", "gopkg.in/natefinch/lumberjack.v2"},
 		},
 	}
 	for _, tt := range tests {
