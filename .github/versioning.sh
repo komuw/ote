@@ -10,7 +10,7 @@ shopt -s nullglob
 export DEBIAN_FRONTEND=noninteractive
 
 
-# https://github.com/anordal/shellharden/blob/master/how_to_do_things_safely_in_bash.md
+# https://github.com/anordal/shellharden/blob/main/how_to_do_things_safely_in_bash.md
 # http://wiki.bash-hackers.org/syntax/pe#use_a_default_value
 
 
@@ -25,6 +25,6 @@ fi
 
 
 printf "\n creating git tag: ${VERSION} \n"
-printf "\n with commit message, see Changelong: https://github.com/komuw/ote/blob/master/CHANGELOG.md \n" && \
-  git tag -a "${VERSION}" -m "see Changelong: https://github.com/komuw/ote/blob/master/CHANGELOG.md"
+printf "\n with commit message, see Changelong: https://github.com/komuw/ote/blob/main/CHANGELOG.md \n" && \
+  git tag -a "${VERSION}" -m "see Changelong: https://github.com/komuw/ote/blob/main/CHANGELOG.md"
 printf "\n git push the tag::\n" && git push --all -u --follow-tags

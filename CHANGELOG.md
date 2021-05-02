@@ -2,6 +2,10 @@
 
 Most recent version is listed first.  
 
+## v0.0.4
+- rewrite: https://github.com/komuw/ote/pull/18
+  Get all the golang files in a project, parse them, get imports
+
 
 ## v0.0.3
 -  take into account files ending in _test.go: https://github.com/komuw/ote/pull/14
