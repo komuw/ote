@@ -161,8 +161,6 @@ func Test_getTestModules(t *testing.T) {
 		root string
 		want []string
 	}{
-		// TODO: undo the comment
-
 		{
 			name: "root with ending slash",
 			root: "testdata/mod1/",
@@ -173,11 +171,20 @@ func Test_getTestModules(t *testing.T) {
 			root: "testdata/mod1",
 			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
-
 		{
 			name: "main module that has nested module inside",
 			root: "testdata/mod2",
 			want: []string{"github.com/shirou/gopsutil", "gopkg.in/natefinch/lumberjack.v2"},
+		},
+		{
+			name: "module that is nested module inside another main",
+			root: "testdata/mod2/nestedModule1",
+			want: []string{"crawshaw.io/sqlite"},
+		},
+		{
+			name: "module that is nested module inside another main take II",
+			root: "testdata/mod2/nestedModule2",
+			want: []string{"github.com/sirupsen/logrus"},
 		},
 	}
 	for _, tt := range tests {
@@ -193,16 +200,3 @@ func Test_getTestModules(t *testing.T) {
 		})
 	}
 }
-
-// {
-// 	name:       "main module that has nested module inside",
-// 	root:       "testdata/mod2",
-// 	importPath: "github.com/hashicorp/vault/api",
-// 	want:       "github.com/hashicorp/vault/api",
-// },
-// {
-// 	name:       "module that is nested module inside another main",
-// 	root:       "testdata/mod2/nestedModule1",
-// 	importPath: "crawshaw.io/sqlite",
-// 	want:       "crawshaw.io/sqlite",
-// },
