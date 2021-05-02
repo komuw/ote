@@ -20,7 +20,7 @@ import (
 
 // TODO: remove this:
 // Usage:
-//   go run . -f testdata/mod2/ -r
+//   go run . -f testdata/mod1/ -r
 func main() {
 	f, r := cli()
 

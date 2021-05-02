@@ -16,9 +16,9 @@ func Test_getModFile(t *testing.T) {
 	}{
 
 		{
-			name:      "mod2",
-			gomodFile: "testdata/mod2/go.mod",
-			want:      "testdata/mod2",
+			name:      "mod1",
+			gomodFile: "testdata/mod1/go.mod",
+			want:      "testdata/mod1",
 		},
 	}
 	for _, tt := range tests {
@@ -33,7 +33,7 @@ func Test_getModFile(t *testing.T) {
 }
 
 func Test_updateMod(t *testing.T) {
-	f, _ := getModFile("testdata/mod2/go.mod")
+	f, _ := getModFile("testdata/mod1/go.mod")
 	t.Cleanup(func() {
 		f.Cleanup()
 	})
@@ -45,7 +45,7 @@ func Test_updateMod(t *testing.T) {
 	}{
 		{
 
-			name:            "mod2",
+			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 			f:               f,
 		},
@@ -61,7 +61,7 @@ func Test_updateMod(t *testing.T) {
 }
 
 func Test_writeMod(t *testing.T) {
-	f, _ := getModFile("testdata/mod2/go.mod")
+	f, _ := getModFile("testdata/mod1/go.mod")
 	t.Cleanup(func() {
 		f.Cleanup()
 	})
@@ -76,13 +76,13 @@ func Test_writeMod(t *testing.T) {
 	}{
 		{
 
-			name:            "mod2",
+			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 			f:               f,
-			gomodFile:       "testdata/mod2/go.mod",
+			gomodFile:       "testdata/mod1/go.mod",
 			readonly:        true,
 			want: []string{
-				"module testdata/mod2",
+				"module testdata/mod1",
 				"github.com/frankban/quicktest v1.12.1 // test",
 				"github.com/shirou/gopsutil v2.20.9+incompatible // test",
 			},
