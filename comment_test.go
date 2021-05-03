@@ -141,6 +141,39 @@ func TestSetTest(t *testing.T) {
 			expected: "",
 			add:      false,
 		},
+
+		{
+			line: &modfile.Line{
+				Comments: modfile.Comments{
+					Suffix: []modfile.Comment{
+						{
+							// existing `test` comment that has no spacing with the slashes is removed
+							Token:  "//test\n",
+							Suffix: true,
+						},
+					},
+				},
+			},
+			expected: "",
+			add:      false,
+		},
+
+		{
+			line: &modfile.Line{
+				Comments: modfile.Comments{
+					Suffix: []modfile.Comment{
+						{
+							// existing `test` comment that has no spacing with the slashes
+							// and has no newline is removed
+							Token:  "//test",
+							Suffix: true,
+						},
+					},
+				},
+			},
+			expected: "",
+			add:      false,
+		},
 	}
 
 	for _, v := range tt {
