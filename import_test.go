@@ -186,6 +186,11 @@ func Test_getTestModules(t *testing.T) {
 			root: "testdata/mod2/nestedModule2",
 			want: []string{"github.com/sirupsen/logrus"},
 		},
+		{
+			name: "module with vendor directory",
+			root: "testdata/mod3",
+			want: []string{"go.uber.org/goleak"},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
