@@ -187,24 +187,8 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	// TODO: turn this into stand-alone testable function
-	fetchToAnalyze := func() []string {
-		notToBetAnalzyed := []string{}
-		for _, goFile := range allGoFiles {
-			for _, mod := range nonMainModFileDirs {
-				if strings.Contains(goFile, mod) {
-					// this file should not be analyzed because it belongs
-					// to a nested module
-					notToBetAnalzyed = append(notToBetAnalzyed, goFile)
-				}
-			}
-		}
+	tobeAnalyzed := fetchToAnalyze(allGoFiles, nonMainModFileDirs)
 
-		tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
-		return tobeAnalyzed // no need to dedupe. files are unlikely to be duplicates.
-	}
-
-	tobeAnalyzed := fetchToAnalyze()
 	// TODO: turn this into stand-alone testable function
 	fetchPaths := func() ([]string, []string, error) {
 		// TODO: turn into
@@ -246,4 +230,22 @@ func getTestModules(root string) ([]string, error) {
 	trueTestModules := difference(testModules, nonTestModules)
 
 	return trueTestModules, nil
+}
+
+// fetchToAnalyze returns only the list of Go files that need to be analyzed.
+// it excludes files that are in directories which are nested go modules.
+func fetchToAnalyze(allGoFiles []string, nonMainModFileDirs []string) []string {
+	notToBetAnalzyed := []string{}
+	for _, goFile := range allGoFiles {
+		for _, mod := range nonMainModFileDirs {
+			if strings.Contains(goFile, mod) {
+				// this file should not be analyzed because it belongs
+				// to a nested module
+				notToBetAnalzyed = append(notToBetAnalzyed, goFile)
+			}
+		}
+	}
+
+	tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
+	return tobeAnalyzed // no need to dedupe. files are unlikely to be duplicates.
 }
