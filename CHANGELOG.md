@@ -8,6 +8,7 @@ Most recent version is listed first.
 - Work with nested Go modules: https://github.com/komuw/ote/pull/17
   In repositories that have nested Go modules; ignore all the nested modules and only   
   work/analyze the module that is passed in as an argument to `ote`
+- Have all static analysis passes succeed: https://github.com/komuw/ote/pull/20
 
 
 ## v0.0.3
