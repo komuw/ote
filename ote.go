@@ -18,9 +18,13 @@ import (
 
 // TODO: better errors
 
-// TODO: remove this:
 // Usage:
-//   go run . -f testdata/mod1/ -r
+//   1.
+//    go run . -f testdata/mod1/ -r
+//
+//   2.
+//    export export GOPACKAGESDEBUG=true &&\
+//    go run . -f testdata/mod1/ -r
 func main() {
 	f, r := cli()
 
