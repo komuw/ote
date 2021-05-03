@@ -35,30 +35,30 @@ func main() {
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
-	err := loadStd()
-	if err != nil {
-		log.Fatal("unable to load Stdlibs: ", err)
+	e := loadStd()
+	if e != nil {
+		return e
 	}
 
 	gomodFile := filepath.Join(fp, "go.mod")
-	f, err := getModFile(gomodFile)
-	if err != nil {
-		return err
+	f, errM := getModFile(gomodFile)
+	if errM != nil {
+		return errM
 	}
 	defer f.Cleanup()
 
-	trueTestModules, err := getTestModules(fp)
-	if err != nil {
-		return err
+	trueTestModules, errT := getTestModules(fp)
+	if errT != nil {
+		return errT
 	}
-	err = updateMod(trueTestModules, f)
-	if err != nil {
-		return err
+	errU := updateMod(trueTestModules, f)
+	if errU != nil {
+		return errU
 	}
 
-	err = writeMod(f, gomodFile, w, readonly)
-	if err != nil {
-		return err
+	errW := writeMod(f, gomodFile, w, readonly)
+	if errW != nil {
+		return errW
 	}
 
 	return nil
