@@ -35,9 +35,9 @@ examples:
         
     ote -f /tmp/myPkg     # update go.mod in the /tmp/myPkg directory
 
-    ote -r                # (readonly) write to stdout instead of updating the go.mod in the current directory
+    ote -r                # write to stdout instead of updating the go.mod in the current directory
 
-    ote -f /tmp/myPkg -r  # (readonly) write to stdout instead of updating go.mod file in the /tmp/myPkg directory.  
+    ote -f /tmp/myPkg -r  # write to stdout instead of updating go.mod file in the /tmp/myPkg directory.  
 ```
 
 If your application has a `go.mod` file like the following;
