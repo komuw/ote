@@ -19,7 +19,9 @@ const goosList = "aix android darwin dragonfly freebsd hurd illumos ios js linux
 const goarchList = "386 amd64 amd64p32 arm armbe arm64 arm64be ppc64 ppc64le mips mipsle mips64 mips64le mips64p32 mips64p32le ppc riscv riscv64 s390 s390x sparc sparc64 wasm "
 const cGo = "cgo"
 
-var stdLibPkgs = make(map[string]struct{})
+var stdLibPkgs = map[string]struct{}{
+	"C": {}, // cGo. see: https://blog.golang.org/cgo
+}
 
 func loadStd() error {
 	pkgs, err := packages.Load(nil, "std")
@@ -78,6 +80,8 @@ func fetchModule(root, importPath string) (string, error) {
 	pkgs, err := packages.Load(
 		cfg,
 		fmt.Sprintf("pattern=%s", importPath),
+		// to show the Go commands that this method call will invoke;
+		// run ote while the env var `export GOPACKAGESDEBUG=true` is set on the commandline
 	)
 	if err != nil {
 		return "", err
@@ -106,6 +110,7 @@ func fetchModule(root, importPath string) (string, error) {
 }
 
 func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
+	// todo: these two for loops can be made concurrent.
 
 	for _, v := range testImportPaths {
 		m, err := fetchModule(root, v)
@@ -127,12 +132,9 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 }
 
 func getTestModules(root string) ([]string, error) {
-	//TODO: turn into
-	// type importPaths string
-	// testImportPaths    = []importPaths{}
-	testImportPaths := []string{}
-	nonTestImportPaths := []string{}
 
+	allGoFiles := []string{}
+	nonMainModFileDirs := []string{}
 	err := filepath.WalkDir(
 		// note: WalkDir reads an entire directory into memory before proceeding to walk that directory.
 		// see documentation of filepath.WalkDir
@@ -150,16 +152,57 @@ func getTestModules(root string) ([]string, error) {
 				// non regular files. nothing to parse
 				return nil
 			}
+
 			fName := d.Name()
+			if filepath.Ext(fName) == ".mod" {
+				if path != filepath.Join(root, "go.mod") {
+					nonMainModFileDirs = append(nonMainModFileDirs, filepath.Dir(path))
+				}
+			}
 			if filepath.Ext(fName) != ".go" {
 				return nil
 			}
 
+			allGoFiles = append(allGoFiles, path)
+			return nil
+		},
+	)
+	if err != nil {
+		return []string{}, err
+	}
+
+	fetchToAnalyze := func() []string {
+		notToBetAnalzyed := []string{}
+		for _, goFile := range allGoFiles {
+			for _, mod := range nonMainModFileDirs {
+				if strings.Contains(goFile, mod) {
+					// this file should not be analyzed because it belongs
+					// to a nested module
+					notToBetAnalzyed = append(notToBetAnalzyed, goFile)
+				}
+			}
+		}
+
+		tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
+		return tobeAnalyzed
+	}
+
+	tobeAnalyzed := fetchToAnalyze()
+	fetchPaths := func() ([]string, []string, error) {
+		// TODO: turn into
+		// type importPaths string
+		// testImportPaths = []importPaths{}
+
+		testImportPaths := []string{}
+		nonTestImportPaths := []string{}
+
+		for _, path := range tobeAnalyzed {
 			impPaths, errF := fetchImports(path)
 			if errF != nil {
-				return errF
+				return []string{}, []string{}, errF
 			}
-			if strings.Contains(fName, "_test.go") {
+
+			if strings.Contains(path, "_test.go") {
 				// this takes care of both;
 				// (i) test files
 				// (ii) example files(https://blog.golang.org/examples)
@@ -167,10 +210,11 @@ func getTestModules(root string) ([]string, error) {
 			} else {
 				nonTestImportPaths = append(nonTestImportPaths, impPaths...)
 			}
+		}
+		return testImportPaths, nonTestImportPaths, nil
+	}
 
-			return nil
-		},
-	)
+	testImportPaths, nonTestImportPaths, err := fetchPaths()
 	if err != nil {
 		return []string{}, err
 	}

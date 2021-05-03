@@ -3,8 +3,11 @@
 Most recent version is listed first.  
 
 ## v0.0.4
-- rewrite: https://github.com/komuw/ote/pull/18
+- rewrite how `ote` is implemented: https://github.com/komuw/ote/pull/18
   Get all the golang files in a project, parse them, get imports
+- Work with nested Go modules: https://github.com/komuw/ote/pull/17
+  In repositories that have nested Go modules; ignore all the nested modules and only   
+  work/analyze the module that is passed in as an argument to `ote`
 
 
 ## v0.0.3
