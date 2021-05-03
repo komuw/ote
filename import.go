@@ -115,6 +115,15 @@ func fetchModule(root, importPath string) (string, error) {
 func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
 	// todo: these two for loops can be made concurrent.
 
+	// TODO:
+	// - find out from the big repositories(nomad, juju etc) what percentage of importPaths
+	//   exist in both `testImportPaths` & `nonTestImportPaths`
+	// - if the percentage is significant;
+	//   it is worth removing those importPaths from both lists before calling `fetchModule`
+	//   This is because, the modules from which they come from are no longer important to us
+	//   since we now know that they are not exclusively test-only modules.
+	//   This might be important to do since `fetchModule` is the most expensive code in `ote`
+
 	for _, v := range testImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
