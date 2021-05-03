@@ -39,6 +39,7 @@ func isStdLibPkg(pkg string) bool {
 	return ok
 }
 
+// fetchImports returns all the imports found in one .go file
 func fetchImports(file string) ([]string, error) {
 	fset := token.NewFileSet()
 	var src interface{} = nil
@@ -115,15 +116,6 @@ func fetchModule(root, importPath string) (string, error) {
 func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
 	// todo: these two for loops can be made concurrent.
 
-	// TODO:
-	// - find out from the big repositories(nomad, juju etc) what percentage of importPaths
-	//   exist in both `testImportPaths` & `nonTestImportPaths`
-	// - if the percentage is significant;
-	//   it is worth removing those importPaths from both lists before calling `fetchModule`
-	//   This is because, the modules from which they come from are no longer important to us
-	//   since we now know that they are not exclusively test-only modules.
-	//   This might be important to do since `fetchModule` is the most expensive code in `ote`
-
 	for _, v := range testImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
@@ -187,38 +179,8 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	tobeAnalyzed := fetchToAnalyze(allGoFiles, nonMainModFileDirs)
-
-	// TODO: turn this into stand-alone testable function
-	fetchPaths := func() ([]string, []string, error) {
-		// TODO: turn into
-		// type importPaths string
-		// testImportPaths = []importPaths{}
-
-		testImportPaths := []string{}
-		nonTestImportPaths := []string{}
-
-		for _, path := range tobeAnalyzed {
-			impPaths, errF := fetchImports(path)
-			if errF != nil {
-				return []string{}, []string{}, errF
-			}
-
-			if strings.Contains(path, "_test.go") {
-				// this takes care of both;
-				// (i) test files
-				// (ii) example files(https://blog.golang.org/examples)
-				testImportPaths = append(testImportPaths, impPaths...)
-			} else {
-				nonTestImportPaths = append(nonTestImportPaths, impPaths...)
-			}
-		}
-
-		// dedupe, since one importPath is likely to have been used in multiple Go files.
-		return dedupe(testImportPaths), dedupe(nonTestImportPaths), nil
-	}
-
-	testImportPaths, nonTestImportPaths, err := fetchPaths()
+	FilesTobeAnalyzed := fetchToAnalyze(allGoFiles, nonMainModFileDirs)
+	testImportPaths, nonTestImportPaths, err := getAllImports(FilesTobeAnalyzed)
 	if err != nil {
 		return []string{}, err
 	}
@@ -248,4 +210,33 @@ func fetchToAnalyze(allGoFiles []string, nonMainModFileDirs []string) []string {
 
 	tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
 	return tobeAnalyzed // no need to dedupe. files are unlikely to be duplicates.
+}
+
+// getAllImports aggregates all imports from a list of .go files
+func getAllImports(files []string) ([]string, []string, error) {
+	// TODO: turn into
+	// type importPaths string
+	// testImportPaths = []importPaths{}
+
+	testImportPaths := []string{}
+	nonTestImportPaths := []string{}
+
+	for _, filePath := range files {
+		impPaths, errF := fetchImports(filePath)
+		if errF != nil {
+			return []string{}, []string{}, errF
+		}
+
+		if strings.Contains(filePath, "_test.go") {
+			// this takes care of both;
+			// (i) test files
+			// (ii) example files(https://blog.golang.org/examples)
+			testImportPaths = append(testImportPaths, impPaths...)
+		} else {
+			nonTestImportPaths = append(nonTestImportPaths, impPaths...)
+		}
+	}
+
+	// dedupe, since one importPath is likely to have been used in multiple Go files.
+	return dedupe(testImportPaths), dedupe(nonTestImportPaths), nil
 }
