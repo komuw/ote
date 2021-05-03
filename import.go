@@ -178,8 +178,8 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	FilesTobeAnalyzed := fetchToAnalyze(allGoFiles, nonMainModFileDirs)
-	testImportPaths, nonTestImportPaths, err := getAllImports(FilesTobeAnalyzed)
+	filesTobeAnalyzed := fetchToAnalyze(allGoFiles, nonMainModFileDirs)
+	testImportPaths, nonTestImportPaths, err := getAllImports(filesTobeAnalyzed)
 	if err != nil {
 		return []string{}, err
 	}
