@@ -136,7 +136,6 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 }
 
 func getTestModules(root string) ([]string, error) {
-
 	allGoFiles := []string{}
 	nonMainModFileDirs := []string{}
 	err := filepath.WalkDir(
