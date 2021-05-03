@@ -166,7 +166,7 @@ func getTestModules(root string) ([]string, error) {
 				return nil
 			}
 			if strings.Contains(path, "vendor/") {
-				// ignore vendor/ directory
+				// ignore files inside vendor/ directory
 				return nil
 			}
 
