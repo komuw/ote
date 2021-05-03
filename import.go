@@ -113,17 +113,17 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 	// todo: these two for loops can be made concurrent.
 
 	for _, v := range testImportPaths {
-		m, err := fetchModule(root, v)
-		if err != nil {
-			return testModules, nonTestModules, err
+		m, errF := fetchModule(root, v)
+		if errF != nil {
+			return testModules, nonTestModules, errF
 		}
 		testModules = append(testModules, m)
 	}
 
 	for _, v := range nonTestImportPaths {
-		m, err := fetchModule(root, v)
-		if err != nil {
-			return testModules, nonTestModules, err
+		m, errF := fetchModule(root, v)
+		if errF != nil {
+			return testModules, nonTestModules, errF
 		}
 		nonTestModules = append(nonTestModules, m)
 	}
