@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	//used in both test and non test files
+	// used in both test and non test files
 	"rsc.io/quote"
 )
 

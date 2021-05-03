@@ -9,7 +9,6 @@ import (
 )
 
 func TestIsTest(t *testing.T) {
-
 	tt := []struct {
 		line     *modfile.Line
 		expected bool
@@ -59,11 +58,9 @@ func TestIsTest(t *testing.T) {
 		c := qt.New(t)
 		c.Assert(res, qt.Equals, v.expected)
 	}
-
 }
 
 func TestSetTest(t *testing.T) {
-
 	tt := []struct {
 		line     *modfile.Line
 		expected string

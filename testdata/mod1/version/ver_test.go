@@ -8,7 +8,7 @@ import (
 
 	"github.com/shirou/gopsutil/mem"
 
-	//used in both test and non test files
+	// used in both test and non test files
 	"rsc.io/quote"
 )
 
@@ -19,15 +19,12 @@ func TestFoo(t *testing.T) {
 		numbers := []int{42, 47}
 		c.Assert(numbers, qt.DeepEquals, []int{42, 47})
 	})
-
 }
 
 func TestBaa(t *testing.T) {
-
 	v, err := mem.VirtualMemory()
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(v)
-
 }

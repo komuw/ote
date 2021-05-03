@@ -7,7 +7,6 @@ import (
 )
 
 func Test_difference(t *testing.T) {
-
 	tests := []struct {
 		name            string
 		testModules     []string

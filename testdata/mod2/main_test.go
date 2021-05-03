@@ -8,7 +8,6 @@ import (
 )
 
 func TestBaa(t *testing.T) {
-
 	v, err := mem.VirtualMemory()
 	if err != nil {
 		t.Fatal(err)

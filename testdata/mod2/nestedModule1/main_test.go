@@ -8,6 +8,5 @@ import (
 )
 
 func TestBaa(t *testing.T) {
-
 	_ = sqlite.SQLITE_DENY
 }

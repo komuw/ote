@@ -7,6 +7,5 @@ import (
 )
 
 func TestBaa(t *testing.T) {
-
 	_ = lumberjack.Logger{}
 }
