@@ -162,6 +162,10 @@ func getTestModules(root string) ([]string, error) {
 			if filepath.Ext(fName) != ".go" {
 				return nil
 			}
+			if strings.Contains(path, "vendor/") {
+				// ignore vendor/ directory
+				return nil
+			}
 
 			allGoFiles = append(allGoFiles, path)
 			return nil
