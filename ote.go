@@ -1,9 +1,12 @@
-// ote: updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
+// ote: updates a package's go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
 //
 // It maybe useful in places where it is important to audit all dependencies that are going to run in production.
 //
-// Install: go get github.com/komuw/ote
-// Usage: ote .
+// Install:
+//    go install github.com/komuw/ote@latest
+//
+// Usage:
+//    ote .
 //
 package main
 
