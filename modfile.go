@@ -72,28 +72,36 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
 	f.SortBlocks()
 	f.Cleanup()
-	b, err := f.Format()
-	if err != nil {
-		return err
+	b, errF := f.Format()
+	if errF != nil {
+		return errF
 	}
 
-	i, err := os.Stat(gomodFile)
-	if err != nil {
-		return err
+	i, errS := os.Stat(gomodFile)
+	if errS != nil {
+		return errS
 	}
 
 	if readonly {
 		fmt.Fprintln(w, string(b))
 	} else {
-		fi, err := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
-		if err != nil {
-			return err
+		fi, errO := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
+		if errO != nil {
+			return errO
 		}
-		defer fi.Close()
 
-		_, err = fi.Write(b)
+		_, errW := fi.Write(b)
+		if errW != nil {
+			return errW
+		}
+
+		errC := fi.Close()
+		if errC != nil {
+			return errC
+		}
+
 		fmt.Fprintln(w, "successfully updated go.mod file.")
-		return err
+		return errC
 	}
 
 	return nil
