@@ -23,7 +23,7 @@ import (
 //    go run . -f testdata/mod1/ -r
 //
 //   2.
-//    export export GOPACKAGESDEBUG=true &&\
+//    export export GOPACKAGESDEBUG=true && \
 //    go run . -f testdata/mod1/ -r
 func main() {
 	f, r := cli()

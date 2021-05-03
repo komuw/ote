@@ -80,6 +80,8 @@ func fetchModule(root, importPath string) (string, error) {
 	pkgs, err := packages.Load(
 		cfg,
 		fmt.Sprintf("pattern=%s", importPath),
+		// to show the Go commands that this method call will invoke;
+		// run ote while the env var `export GOPACKAGESDEBUG=true` is set on the commandline
 	)
 	if err != nil {
 		return "", err
@@ -108,6 +110,7 @@ func fetchModule(root, importPath string) (string, error) {
 }
 
 func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
+	// todo: these two for loops can be made concurrent.
 
 	for _, v := range testImportPaths {
 		m, err := fetchModule(root, v)
