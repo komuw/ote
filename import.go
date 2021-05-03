@@ -178,6 +178,7 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
+	// TODO: turn this into stand-alone testable function
 	fetchToAnalyze := func() []string {
 		notToBetAnalzyed := []string{}
 		for _, goFile := range allGoFiles {
@@ -191,10 +192,11 @@ func getTestModules(root string) ([]string, error) {
 		}
 
 		tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
-		return tobeAnalyzed
+		return tobeAnalyzed // no need to dedupe. files are unlikely to be duplicates.
 	}
 
 	tobeAnalyzed := fetchToAnalyze()
+	// TODO: turn this into stand-alone testable function
 	fetchPaths := func() ([]string, []string, error) {
 		// TODO: turn into
 		// type importPaths string
@@ -218,7 +220,9 @@ func getTestModules(root string) ([]string, error) {
 				nonTestImportPaths = append(nonTestImportPaths, impPaths...)
 			}
 		}
-		return testImportPaths, nonTestImportPaths, nil
+
+		// dedupe, since one importPath is likely to have been used in multiple Go files.
+		return dedupe(testImportPaths), dedupe(nonTestImportPaths), nil
 	}
 
 	testImportPaths, nonTestImportPaths, err := fetchPaths()
