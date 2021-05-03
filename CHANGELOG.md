@@ -10,6 +10,7 @@ Most recent version is listed first.
   work/analyze the module that is passed in as an argument to `ote`
 - Have all static analysis passes succeed: https://github.com/komuw/ote/pull/20
 - dont analyze Go files inside vendor/ directory: https://github.com/komuw/ote/pull/21
+- render unformatted `//test` comment correctly: https://github.com/komuw/ote/pull/24
 
 
 ## v0.0.3
