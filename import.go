@@ -39,6 +39,7 @@ func isStdLibPkg(pkg string) bool {
 	return ok
 }
 
+// fetchImports returns all the imports found in one .go file
 func fetchImports(file string) ([]string, error) {
 	fset := token.NewFileSet()
 	var src interface{} = nil
@@ -96,6 +97,9 @@ func fetchModule(root, importPath string) (string, error) {
 
 	pkg := pkgs[0]
 	if pkg.Module == nil {
+		// this can be raised if an import path is inside a file that has some build tag
+		// that ote didn't take into account.
+		// see: https://github.com/komuw/ote/issues/3
 		return "", fmt.Errorf("import %s does not belong to any module", importPath)
 	}
 
@@ -132,7 +136,6 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 }
 
 func getTestModules(root string) ([]string, error) {
-
 	allGoFiles := []string{}
 	nonMainModFileDirs := []string{}
 	err := filepath.WalkDir(
@@ -162,6 +165,10 @@ func getTestModules(root string) ([]string, error) {
 			if filepath.Ext(fName) != ".go" {
 				return nil
 			}
+			if strings.Contains(path, "vendor/") {
+				// ignore files inside vendor/ directory
+				return nil
+			}
 
 			allGoFiles = append(allGoFiles, path)
 			return nil
@@ -171,50 +178,8 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	fetchToAnalyze := func() []string {
-		notToBetAnalzyed := []string{}
-		for _, goFile := range allGoFiles {
-			for _, mod := range nonMainModFileDirs {
-				if strings.Contains(goFile, mod) {
-					// this file should not be analyzed because it belongs
-					// to a nested module
-					notToBetAnalzyed = append(notToBetAnalzyed, goFile)
-				}
-			}
-		}
-
-		tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
-		return tobeAnalyzed
-	}
-
-	tobeAnalyzed := fetchToAnalyze()
-	fetchPaths := func() ([]string, []string, error) {
-		// TODO: turn into
-		// type importPaths string
-		// testImportPaths = []importPaths{}
-
-		testImportPaths := []string{}
-		nonTestImportPaths := []string{}
-
-		for _, path := range tobeAnalyzed {
-			impPaths, errF := fetchImports(path)
-			if errF != nil {
-				return []string{}, []string{}, errF
-			}
-
-			if strings.Contains(path, "_test.go") {
-				// this takes care of both;
-				// (i) test files
-				// (ii) example files(https://blog.golang.org/examples)
-				testImportPaths = append(testImportPaths, impPaths...)
-			} else {
-				nonTestImportPaths = append(nonTestImportPaths, impPaths...)
-			}
-		}
-		return testImportPaths, nonTestImportPaths, nil
-	}
-
-	testImportPaths, nonTestImportPaths, err := fetchPaths()
+	filesTobeAnalyzed := fetchToAnalyze(allGoFiles, nonMainModFileDirs)
+	testImportPaths, nonTestImportPaths, err := getAllImports(filesTobeAnalyzed)
 	if err != nil {
 		return []string{}, err
 	}
@@ -226,4 +191,51 @@ func getTestModules(root string) ([]string, error) {
 	trueTestModules := difference(testModules, nonTestModules)
 
 	return trueTestModules, nil
+}
+
+// fetchToAnalyze returns only the list of Go files that need to be analyzed.
+// it excludes files that are in directories which are nested go modules.
+func fetchToAnalyze(allGoFiles []string, nonMainModFileDirs []string) []string {
+	notToBetAnalzyed := []string{}
+	for _, goFile := range allGoFiles {
+		for _, mod := range nonMainModFileDirs {
+			if strings.Contains(goFile, mod) {
+				// this file should not be analyzed because it belongs
+				// to a nested module
+				notToBetAnalzyed = append(notToBetAnalzyed, goFile)
+			}
+		}
+	}
+
+	tobeAnalyzed := difference(allGoFiles, notToBetAnalzyed)
+	return tobeAnalyzed // no need to dedupe. files are unlikely to be duplicates.
+}
+
+// getAllImports aggregates all imports from a list of .go files
+func getAllImports(files []string) ([]string, []string, error) {
+	// TODO: turn into
+	// type importPaths string
+	// testImportPaths = []importPaths{}
+
+	testImportPaths := []string{}
+	nonTestImportPaths := []string{}
+
+	for _, filePath := range files {
+		impPaths, errF := fetchImports(filePath)
+		if errF != nil {
+			return []string{}, []string{}, errF
+		}
+
+		if strings.Contains(filePath, "_test.go") {
+			// this takes care of both;
+			// (i) test files
+			// (ii) example files(https://blog.golang.org/examples)
+			testImportPaths = append(testImportPaths, impPaths...)
+		} else {
+			nonTestImportPaths = append(nonTestImportPaths, impPaths...)
+		}
+	}
+
+	// dedupe, since one importPath is likely to have been used in multiple Go files.
+	return dedupe(testImportPaths), dedupe(nonTestImportPaths), nil
 }
