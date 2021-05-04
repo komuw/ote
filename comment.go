@@ -88,8 +88,8 @@ func setTest(line *modfile.Line, add bool) {
 		com.Token = "// test; " + text
 	} else {
 		// Removing comment.
-		f := strings.TrimSpace(strings.ReplaceAll(line.Suffix[0].Token, " ", ""))
-		if f == "//test" {
+		f := strings.TrimSpace(strings.TrimPrefix(line.Suffix[0].Token, string(slashSlash)))
+		if f == "test" {
 			// Remove whole comment.
 			line.Suffix = nil
 			return
