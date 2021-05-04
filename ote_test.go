@@ -12,12 +12,14 @@ func Test_run(t *testing.T) {
 		name     string
 		fp       string
 		readonly bool
+		wantErr  bool
 		want     string
 	}{
 		{
 			name:     "ote's own modfile",
 			fp:       ".",
 			readonly: true,
+			wantErr:  false,
 			want: `module github.com/komuw/ote
 
 go 1.16
@@ -36,6 +38,7 @@ require (
 			name:     "testdata/mod1",
 			fp:       "testdata/mod1",
 			readonly: true,
+			wantErr:  false,
 			want: `module testdata/mod1
 
 go 1.16
@@ -63,6 +66,7 @@ require (
 			name:     "testdata/mod2",
 			fp:       "testdata/mod2",
 			readonly: true,
+			wantErr:  false,
 			want: `module testdata/mod2
 
 go 1.16
@@ -97,6 +101,7 @@ require (
 			name:     "testdata/mod3",
 			fp:       "testdata/mod3",
 			readonly: true,
+			wantErr:  false,
 			want: `module testdata/mod3
 
 go 1.16
@@ -114,6 +119,7 @@ require (
 			name:     "testdata/mod4",
 			fp:       "testdata/mod4",
 			readonly: true,
+			wantErr:  false,
 			want: `module testdata/mod4
 
 go 1.16
@@ -133,6 +139,14 @@ require (
 
 `,
 		},
+
+		{
+			name:     "testdata/nonExistentPackage",
+			fp:       "testdata/nonExistentPackage",
+			readonly: true,
+			wantErr:  true,
+			want:     ``,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -140,7 +154,11 @@ require (
 
 			w := &bytes.Buffer{}
 			err := run(tt.fp, w, tt.readonly)
-			c.Assert(err, qt.IsNil)
+			if tt.wantErr {
+				c.Assert(err.Error(), qt.Contains, "no such file or directory")
+			} else {
+				c.Assert(err, qt.IsNil)
+			}
 
 			got := w.String()
 			c.Assert(got, qt.Equals, tt.want)
