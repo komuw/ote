@@ -33,9 +33,9 @@ func Test_getModFile(t *testing.T) {
 }
 
 func Test_updateMod(t *testing.T) {
-	f, _ := getModFile("testdata/mod1/go.mod")
+	fmod1, _ := getModFile("testdata/mod1/go.mod")
 	t.Cleanup(func() {
-		f.Cleanup()
+		fmod1.Cleanup()
 	})
 
 	tests := []struct {
@@ -47,7 +47,7 @@ func Test_updateMod(t *testing.T) {
 
 			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
-			f:               f,
+			f:               fmod1,
 		},
 	}
 	for _, tt := range tests {
@@ -61,9 +61,13 @@ func Test_updateMod(t *testing.T) {
 }
 
 func Test_writeMod(t *testing.T) {
-	f, _ := getModFile("testdata/mod1/go.mod")
+	fmod1, _ := getModFile("testdata/mod1/go.mod")
 	t.Cleanup(func() {
-		f.Cleanup()
+		fmod1.Cleanup()
+	})
+	fmod4, _ := getModFile("testdata/mod4/go.mod")
+	t.Cleanup(func() {
+		fmod4.Cleanup()
 	})
 
 	tests := []struct {
@@ -78,13 +82,33 @@ func Test_writeMod(t *testing.T) {
 
 			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
-			f:               f,
+			f:               fmod1,
 			gomodFile:       "testdata/mod1/go.mod",
 			readonly:        true,
 			want: []string{
 				"module testdata/mod1",
 				"github.com/frankban/quicktest v1.12.1 // test",
 				"github.com/shirou/gopsutil v2.20.9+incompatible // test",
+			},
+		},
+		{
+
+			name:            "mod4",
+			trueTestModules: []string{"github.com/benweissmann/memongo"},
+			f:               fmod4,
+			gomodFile:       "testdata/mod4/go.mod",
+			readonly:        true,
+			want: []string{
+				"module testdata/mod4",
+				"github.com/alexedwards/scs/v2 v2.4.0",
+				"github.com/aws/aws-sdk-go v1.38.31",
+				"github.com/benweissmann/memongo v0.1.1 // test",
+				"github.com/go-kit/kit v0.10.0",
+				"github.com/ishidawataru/sctp v0.0.0-20210226210310-f2269e66cdee",
+				"github.com/rs/zerolog v1.21.0",
+				"github.com/sirupsen/logrus v1.8.1",
+				"github.com/zeebo/errs/v2 v2.0.3",
+				"go.uber.org/zap v1.13.0",
 			},
 		},
 	}
