@@ -31,7 +31,7 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/frankban/quicktest v1.12.1 // test
 	github.com/go-ole/go-ole v1.2.5 // indirect
-	github.com/hashicorp/nomad v1.0.4
+	github.com/hashicorp/nomad v1.0.4 // The test comment should be removed by ote
 	github.com/pkg/errors v0.9.1
 	github.com/shirou/gopsutil v2.20.9+incompatible // test; PriorComment
 	github.com/stretchr/testify v1.7.0 // indirect
