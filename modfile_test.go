@@ -115,6 +115,7 @@ func Test_writeMod(t *testing.T) {
 				"github.com/benweissmann/memongo v0.1.1 // test",
 				"github.com/go-kit/kit v0.10.0",
 				"github.com/ishidawataru/sctp v0.0.0-20210226210310-f2269e66cdee",
+				"github.com/ory/herodot v0.9.5",
 				"github.com/rs/zerolog v1.21.0",
 				"github.com/sirupsen/logrus v1.8.1",
 				"github.com/zeebo/errs/v2 v2.0.3",
