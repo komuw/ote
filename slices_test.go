@@ -82,3 +82,44 @@ func Test_dedupe(t *testing.T) {
 		})
 	}
 }
+
+func Test_contains(t *testing.T) {
+	tests := []struct {
+		name string
+		a    []string
+		x    string
+		want bool
+	}{
+		{
+			name: "empty slice",
+			a:    []string{},
+			x:    "",
+			want: false,
+		},
+		{
+			name: "nil slice",
+			a:    nil,
+			x:    "",
+			want: false,
+		},
+		{
+			name: "found",
+			a:    []string{"a", "bb", "c"},
+			x:    "bb",
+			want: true,
+		},
+		{
+			name: "not found",
+			a:    []string{"a", "bb", "c"},
+			x:    "d",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := qt.New(t)
+			got := contains(tt.a, tt.x)
+			c.Assert(got, qt.Equals, tt.want)
+		})
+	}
+}

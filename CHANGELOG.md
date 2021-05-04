@@ -13,6 +13,7 @@ Most recent version is listed first.
 - render unformatted `//test` comment correctly: https://github.com/komuw/ote/pull/24
 - perf improvement, do not generate a new string: https://github.com/komuw/ote/pull/25
   This is an improvement of https://github.com/komuw/ote/pull/24
+- call `fetchModule` only for the import paths that are not shared between test files and non-test files: https://github.com/komuw/ote/pull/26
 
 
 ## v0.0.3

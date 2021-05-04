@@ -116,9 +116,25 @@ func fetchModule(root, importPath string) (string, error) {
 }
 
 func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
+	// There could be some import paths that exist in both test files & non-test files.
+	// In hashicorp/nomad we found that to be about 50% of imports.
+	// In juju/juju it is about 80%
+	// see: https://github.com/komuw/ote/issues/22
+	//
+	// Given that, it then only makes sense to filter out this import paths that are common
+	// before calling fetchModule(which is one of the most expensive calls in ote)
+	existsInBoth := []string{}
+	for _, a := range nonTestImportPaths {
+		if contains(testImportPaths, a) {
+			existsInBoth = append(existsInBoth, a)
+		}
+	}
+	testOnlyImportPaths := difference(testImportPaths, existsInBoth)
+	nonTestOnlyImportPaths := difference(nonTestImportPaths, existsInBoth)
+
 	// todo: these two for loops can be made concurrent.
 
-	for _, v := range testImportPaths {
+	for _, v := range testOnlyImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
 			return testModules, nonTestModules, errF
@@ -126,7 +142,7 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 		testModules = append(testModules, m)
 	}
 
-	for _, v := range nonTestImportPaths {
+	for _, v := range nonTestOnlyImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
 			return testModules, nonTestModules, errF

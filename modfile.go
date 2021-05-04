@@ -44,20 +44,10 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		}
 	}
 
-	// contains tells whether a contains x.
-	contains := func(a []string, x modfile.Require) bool {
-		for _, n := range a {
-			if x.Mod.Path == n {
-				return true
-			}
-		}
-		return false
-	}
-
 	for _, fr := range f.Require {
 		line := fr.Syntax
 		if isTest(line) {
-			if !contains(trueTestModules, *fr) {
+			if !contains(trueTestModules, fr.Mod.Path) {
 				// Remove test comment for any module that may be used in both test files and non-test files.
 				// If a module has a test comment but is not in testRequires, it should be removed.
 				setTest(line, false)
@@ -72,20 +62,21 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
 	f.SortBlocks()
 	f.Cleanup()
+
 	b, errF := f.Format()
 	if errF != nil {
 		return errF
 	}
 
-	i, errS := os.Stat(gomodFile)
-	if errS != nil {
-		return errS
-	}
-
 	if readonly {
 		fmt.Fprintln(w, string(b))
 	} else {
-		fi, errO := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
+		i, errS := os.Stat(gomodFile)
+		if errS != nil {
+			return errS
+		}
+
+		fi, errO := os.OpenFile(gomodFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, i.Mode())
 		if errO != nil {
 			return errO
 		}

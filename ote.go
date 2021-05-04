@@ -48,7 +48,7 @@ func run(fp string, w io.Writer, readonly bool) error {
 	if errM != nil {
 		return errM
 	}
-	defer f.Cleanup()
+	// `f.Cleanup` will be called inside `writeMod`
 
 	trueTestModules, errT := getTestModules(fp)
 	if errT != nil {
