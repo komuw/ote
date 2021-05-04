@@ -11,6 +11,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zeebo/errs/v2"
 	"go.uber.org/zap"
+
+	// this is the only dependency that does not appear in test files
+	"github.com/ory/herodot"
 )
 
 func main() {
@@ -27,4 +30,5 @@ func main() {
 	_ = log.DefaultTimestamp
 	_ = zerolog.Logger
 	_ = zap.ErrorLevel
+	_ = herodot.ErrUnauthorized
 }
