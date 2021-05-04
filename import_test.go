@@ -6,28 +6,6 @@ import (
 	qt "github.com/frankban/quicktest"
 )
 
-func Test_loadStd(t *testing.T) {
-	tests := []struct {
-		name    string
-		wantErr bool
-	}{
-		{name: "run", wantErr: false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := qt.New(t)
-			err := loadStd()
-			c.Assert(err, qt.IsNil)
-
-			got := isStdLibPkg("archive/tar")
-			c.Assert(got, qt.IsTrue)
-
-			got2 := isStdLibPkg("nonExistent")
-			c.Assert(got2, qt.IsFalse)
-		})
-	}
-}
-
 func Test_fetchImports(t *testing.T) {
 	tests := []struct {
 		name string
@@ -48,9 +26,6 @@ func Test_fetchImports(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := qt.New(t)
-
-			//  load std libs
-			loadStd()
 
 			got, err := fetchImports(tt.file)
 			c.Assert(err, qt.IsNil)
@@ -195,9 +170,6 @@ func Test_getTestModules(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := qt.New(t)
-
-			//  load std libs
-			loadStd()
 
 			got, err := getTestModules(tt.root)
 			c.Assert(err, qt.IsNil)

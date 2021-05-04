@@ -38,11 +38,6 @@ func main() {
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
-	e := loadStd()
-	if e != nil {
-		return e
-	}
-
 	gomodFile := filepath.Join(fp, "go.mod")
 	f, errM := getModFile(gomodFile)
 	if errM != nil {

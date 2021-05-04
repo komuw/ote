@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"go/parser"
 	"go/token"
 	"io/fs"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"golang.org/x/mod/modfile"
 	"golang.org/x/mod/module"
@@ -21,24 +23,37 @@ const (
 	cGo        = "cgo"
 )
 
+// once is used to ensure that the stdLibPkgs map is populated only once
+var once = &sync.Once{}
 var stdLibPkgs = map[string]struct{}{
 	"C": {}, // cGo. see: https://blog.golang.org/cgo
 }
 
-func loadStd() error {
-	pkgs, err := packages.Load(nil, "std")
-	if err != nil {
-		return err
-	}
-	for _, p := range pkgs {
-		stdLibPkgs[p.PkgPath] = struct{}{}
-	}
-	return nil
-}
+func isStdLibPkg(pkg string) (bool, error) {
+	var err error
+	once.Do(func() {
+		pkgs, errL := packages.Load(nil, "std")
+		if errL != nil {
+			// set stdLibPkgs to empty when error occurs.
+			stdLibPkgs = map[string]struct{}{}
+			err = errL
+		}
+		if len(pkgs) < 10 {
+			// it means an error occured since
+			// we will always have more than 10 pkgs in the Go stdlib
+			for _, p := range pkgs {
+				if len(p.Errors) > 0 {
+					err = errors.New(p.Errors[0].Msg)
+				}
+			}
+		}
+		for _, p := range pkgs {
+			stdLibPkgs[p.PkgPath] = struct{}{}
+		}
+	})
 
-func isStdLibPkg(pkg string) bool {
 	_, ok := stdLibPkgs[pkg]
-	return ok
+	return ok, err
 }
 
 // fetchImports returns all the imports found in one .go file
@@ -57,7 +72,8 @@ func fetchImports(file string) ([]string, error) {
 			if impPath.Path != nil {
 				p := impPath.Path.Value
 				p = strings.Trim(p, "\"")
-				if !isStdLibPkg(p) {
+				stdlib, _ := isStdLibPkg(p) // ignore error, since when error happens; the other value will be false
+				if !stdlib {
 					impPaths = append(impPaths, p)
 				}
 			}

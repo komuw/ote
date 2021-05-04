@@ -17,6 +17,12 @@ func Test_run(t *testing.T) {
 		want     string
 	}{
 		{
+			name:     "ote's own modfile",
+			fp:       ".",
+			readonly: true,
+			want:     `ss`,
+		},
+		{
 			name:     "testdata/mod1",
 			fp:       "testdata/mod1",
 			readonly: true,
