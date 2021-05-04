@@ -77,14 +77,14 @@ func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) err
 		return errF
 	}
 
-	i, errS := os.Stat(gomodFile)
-	if errS != nil {
-		return errS
-	}
-
 	if readonly {
 		fmt.Fprintln(w, string(b))
 	} else {
+		i, errS := os.Stat(gomodFile)
+		if errS != nil {
+			return errS
+		}
+
 		fi, errO := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
 		if errO != nil {
 			return errO
