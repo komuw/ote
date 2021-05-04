@@ -33,7 +33,7 @@ require (
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/hashicorp/nomad v1.0.4
 	github.com/pkg/errors v0.9.1
-	github.com/shirou/gopsutil v2.20.9+incompatible // test
+	github.com/shirou/gopsutil v2.20.9+incompatible // test; PriorComment
 	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/net v0.0.0-20210501142056-aec3718b3fa0 // indirect
 	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887
