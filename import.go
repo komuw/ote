@@ -129,7 +129,6 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 		if contains(testImportPaths, a) {
 			existsInBoth = append(existsInBoth, a)
 		}
-
 	}
 	testOnlyImportPaths := difference(testImportPaths, existsInBoth)
 	nonTestOnlyImportPaths := difference(nonTestImportPaths, existsInBoth)
