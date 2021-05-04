@@ -23,16 +23,18 @@ const (
 	cGo        = "cgo"
 )
 
+const stdlib = "std"
+
 // once is used to ensure that the stdLibPkgs map is populated only once
 var once = &sync.Once{}
 var stdLibPkgs = map[string]struct{}{
 	"C": {}, // cGo. see: https://blog.golang.org/cgo
 }
 
-func isStdLibPkg(pkg string) (bool, error) {
+func isStdLibPkg(pkg string, std string) (bool, error) {
 	var err error
 	once.Do(func() {
-		pkgs, errL := packages.Load(nil, "std")
+		pkgs, errL := packages.Load(nil, std)
 		if errL != nil {
 			// set stdLibPkgs to empty when error occurs.
 			stdLibPkgs = map[string]struct{}{}
@@ -40,7 +42,7 @@ func isStdLibPkg(pkg string) (bool, error) {
 		}
 		if len(pkgs) < 10 {
 			// it means an error occured since
-			// we will always have more than 10 pkgs in the Go stdlib
+			// we will always have more than 10 pkgs in the Go standard lib
 			for _, p := range pkgs {
 				if len(p.Errors) > 0 {
 					err = errors.New(p.Errors[0].Msg)
@@ -72,8 +74,8 @@ func fetchImports(file string) ([]string, error) {
 			if impPath.Path != nil {
 				p := impPath.Path.Value
 				p = strings.Trim(p, "\"")
-				stdlib, _ := isStdLibPkg(p) // ignore error, since when error happens; the other value will be false
-				if !stdlib {
+				isStdlib, _ := isStdLibPkg(p, stdlib) // ignore error, since when error happens; the other value will be false
+				if !isStdlib {
 					impPaths = append(impPaths, p)
 				}
 			}
