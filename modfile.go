@@ -72,6 +72,7 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
 	f.SortBlocks()
 	f.Cleanup()
+
 	b, errF := f.Format()
 	if errF != nil {
 		return errF
