@@ -76,7 +76,7 @@ func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) err
 			return errS
 		}
 
-		fi, errO := os.OpenFile(gomodFile, os.O_RDWR, i.Mode())
+		fi, errO := os.OpenFile(gomodFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, i.Mode())
 		if errO != nil {
 			return errO
 		}
