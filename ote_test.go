@@ -61,7 +61,6 @@ require (
 
 			got := w.String()
 			c.Assert(got, qt.Equals, tt.want)
-
 		})
 	}
 }
