@@ -177,3 +177,34 @@ func Test_getTestModules(t *testing.T) {
 		})
 	}
 }
+
+func Test_isStdLibPkg(t *testing.T) {
+	tests := []struct {
+		name string
+		pkg  string
+		std  string
+		want bool
+	}{
+		{
+			name: "fmt ok",
+			pkg:  "fmt",
+			std:  stdlib,
+			want: true,
+		},
+		{
+			name: "bogus package",
+			pkg:  "bogusPkg",
+			std:  stdlib,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := qt.New(t)
+
+			got, err := isStdLibPkg(tt.pkg, tt.std)
+			c.Assert(err, qt.IsNil)
+			c.Assert(got, qt.Equals, tt.want)
+		})
+	}
+}

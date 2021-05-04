@@ -8,8 +8,6 @@ import (
 )
 
 func Test_run(t *testing.T) {
-	t.Parallel()
-
 	tests := []struct {
 		name     string
 		fp       string
@@ -51,8 +49,6 @@ require (
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
 			c := qt.New(t)
 
 			w := &bytes.Buffer{}
