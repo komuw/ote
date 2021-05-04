@@ -44,20 +44,10 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		}
 	}
 
-	// contains tells whether a contains x.
-	contains := func(a []string, x modfile.Require) bool {
-		for _, n := range a {
-			if x.Mod.Path == n {
-				return true
-			}
-		}
-		return false
-	}
-
 	for _, fr := range f.Require {
 		line := fr.Syntax
 		if isTest(line) {
-			if !contains(trueTestModules, *fr) {
+			if !contains(trueTestModules, fr.Mod.Path) {
 				// Remove test comment for any module that may be used in both test files and non-test files.
 				// If a module has a test comment but is not in testRequires, it should be removed.
 				setTest(line, false)
