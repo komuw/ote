@@ -37,6 +37,10 @@ func Test_updateMod(t *testing.T) {
 	t.Cleanup(func() {
 		fmod1.Cleanup()
 	})
+	fmod4, _ := getModFile("testdata/mod4/go.mod")
+	t.Cleanup(func() {
+		fmod4.Cleanup()
+	})
 
 	tests := []struct {
 		name            string
@@ -48,6 +52,12 @@ func Test_updateMod(t *testing.T) {
 			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 			f:               fmod1,
+		},
+		{
+
+			name:            "mod4",
+			trueTestModules: []string{"github.com/benweissmann/memongo"},
+			f:               fmod4,
 		},
 	}
 	for _, tt := range tests {
