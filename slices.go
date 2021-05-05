@@ -6,16 +6,18 @@ func dedupe(in []string) []string {
 	}
 
 	seen := make(map[string]struct{}, len(in))
+	out := make([]string, len(in))
+	_ = copy(out, in)
 	j := 0
-	for _, v := range in {
+	for _, v := range out {
 		if _, ok := seen[v]; ok {
 			continue
 		}
 		seen[v] = struct{}{}
-		in[j] = v
+		out[j] = v
 		j++
 	}
-	return in[:j]
+	return out[:j]
 }
 
 // difference returns the elements in `a` that aren't in `b`.
