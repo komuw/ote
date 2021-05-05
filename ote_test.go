@@ -14,7 +14,7 @@ func Test_run(t *testing.T) {
 		name     string
 		fp       string
 		readonly bool
-		wantErr  bool
+		wantErr  string
 		want     string
 	}{
 
@@ -22,7 +22,7 @@ func Test_run(t *testing.T) {
 			name:     "testdata/mod1",
 			fp:       "testdata/mod1",
 			readonly: true,
-			wantErr:  false,
+			wantErr:  "",
 			want: `module testdata/mod1
 
 go 1.16
@@ -50,7 +50,7 @@ require (
 			name:     "testdata/mod2",
 			fp:       "testdata/mod2",
 			readonly: true,
-			wantErr:  false,
+			wantErr:  "",
 			want: `module testdata/mod2
 
 go 1.16
@@ -85,7 +85,7 @@ require (
 			name:     "testdata/mod3",
 			fp:       "testdata/mod3",
 			readonly: true,
-			wantErr:  false,
+			wantErr:  "",
 			want: `module testdata/mod3
 
 go 1.16
@@ -103,7 +103,7 @@ require (
 			name:     "testdata/mod4",
 			fp:       "testdata/mod4",
 			readonly: true,
-			wantErr:  false,
+			wantErr:  "",
 			want: `module testdata/mod4
 
 go 1.16
@@ -125,22 +125,38 @@ require (
 		},
 
 		{
+			// TODO: This module should actually not raise an error.
+			// It should succeed.
+			// This should be fixed in:
+			// https://github.com/komuw/ote/issues/3
+			// https://github.com/komuw/ote/issues/27
+			// We should update this test when those issues are solved
+			name:     "testdata/mod5",
+			fp:       "testdata/mod5",
+			readonly: true,
+			wantErr:  "build constraints exclude all Go files in",
+			want:     ``,
+		},
+
+		{
 			name:     "testdata/nonExistentPackage",
 			fp:       "testdata/nonExistentPackage",
 			readonly: true,
-			wantErr:  true,
+			wantErr:  "no such file or directory",
 			want:     ``,
 		},
 	}
 	for _, tt := range tests {
+		tt := tt // capture range variable
+
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
 
 			w := &bytes.Buffer{}
 			err := run(tt.fp, w, tt.readonly)
-			if tt.wantErr {
-				c.Assert(err.Error(), qt.Contains, "no such file or directory")
+			if len(tt.wantErr) > 0 {
+				c.Assert(err.Error(), qt.Contains, tt.wantErr)
 			} else {
 				c.Assert(err, qt.IsNil)
 			}

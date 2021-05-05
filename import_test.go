@@ -26,6 +26,8 @@ func Test_fetchImports(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt // capture range variable
+
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
@@ -78,6 +80,8 @@ func Test_fetchModule(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt // capture range variable
+
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
@@ -127,6 +131,8 @@ func Test_getAllmodules(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt // capture range variable
+
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
@@ -179,6 +185,8 @@ func Test_getTestModules(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt // capture range variable
+
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
@@ -213,6 +221,8 @@ func Test_isStdLibPkg(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt // capture range variable
+
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)

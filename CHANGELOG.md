@@ -10,12 +10,13 @@ Most recent version is listed first.
   work/analyze the module that is passed in as an argument to `ote`
 - Have all static analysis passes succeed: https://github.com/komuw/ote/pull/20
 - dont analyze Go files inside vendor/ directory: https://github.com/komuw/ote/pull/21
-- render unformatted `//test` comment correctly: https://github.com/komuw/ote/pull/24
-- perf improvement, do not generate a new string: https://github.com/komuw/ote/pull/25
+- Render unformatted `//test` comment correctly: https://github.com/komuw/ote/pull/24
+- Perf improvement, do not generate a new string: https://github.com/komuw/ote/pull/25
   This is an improvement of https://github.com/komuw/ote/pull/24
-- call `fetchModule` only for the import paths that are not shared between test files and non-test files: https://github.com/komuw/ote/pull/26
-- add more tests: https://github.com/komuw/ote/pull/29
-- run tests in parallel: https://github.com/komuw/ote/pull/30
+- Call `fetchModule` only for the import paths that are not shared between test files and non-test files: https://github.com/komuw/ote/pull/26
+- Add more tests: https://github.com/komuw/ote/pull/29
+- Run tests in parallel: https://github.com/komuw/ote/pull/30
+- If `ote` is unable to fetch the module for an import path due to build tags, emit appropriate error : https://github.com/komuw/ote/pull/31
 
 
 ## v0.0.3
