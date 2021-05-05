@@ -8,9 +8,13 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
-func Test_getModFile(t *testing.T) {
-	t.Parallel()
+// The tests in this file cannot be ran in parallel with each other
+// ie, no t.Parallel()
+// This is because `modfile.File` is not safe for concurrent use.
+// https://pkg.go.dev/golang.org/x/mod@v0.4.2/modfile#File
+// Adding t.Parallel() here reads to the race detector not been happy
 
+func Test_getModFile(t *testing.T) {
 	tests := []struct {
 		name      string
 		gomodFile string
@@ -25,7 +29,6 @@ func Test_getModFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			c := qt.New(t)
 
 			got, err := getModFile(tt.gomodFile)
@@ -36,8 +39,6 @@ func Test_getModFile(t *testing.T) {
 }
 
 func Test_updateMod(t *testing.T) {
-	t.Parallel()
-
 	fmod1, _ := getModFile("testdata/mod1/go.mod")
 	t.Cleanup(func() {
 		fmod1.Cleanup()
@@ -67,7 +68,6 @@ func Test_updateMod(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			c := qt.New(t)
 
 			err := updateMod(tt.trueTestModules, tt.f)
@@ -77,8 +77,6 @@ func Test_updateMod(t *testing.T) {
 }
 
 func Test_writeMod(t *testing.T) {
-	t.Parallel()
-
 	fmod1, _ := getModFile("testdata/mod1/go.mod")
 	t.Cleanup(func() {
 		fmod1.Cleanup()
@@ -133,7 +131,6 @@ func Test_writeMod(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			c := qt.New(t)
 
 			err := updateMod(tt.trueTestModules, tt.f)
