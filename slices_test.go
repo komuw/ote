@@ -7,6 +7,8 @@ import (
 )
 
 func Test_difference(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name            string
 		testModules     []string
@@ -40,6 +42,7 @@ func Test_difference(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 			got := difference(tt.testModules, tt.nonTestModules)
 			c.Assert(got, qt.DeepEquals, tt.trueTestModules)
@@ -48,6 +51,8 @@ func Test_difference(t *testing.T) {
 }
 
 func Test_dedupe(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		in   []string
@@ -76,6 +81,7 @@ func Test_dedupe(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 			got := dedupe(tt.in)
 			c.Assert(got, qt.DeepEquals, tt.want)
@@ -84,6 +90,8 @@ func Test_dedupe(t *testing.T) {
 }
 
 func Test_contains(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		a    []string
@@ -117,6 +125,7 @@ func Test_contains(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 			got := contains(tt.a, tt.x)
 			c.Assert(got, qt.Equals, tt.want)

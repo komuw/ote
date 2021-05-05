@@ -9,6 +9,8 @@ import (
 )
 
 func TestIsTest(t *testing.T) {
+	t.Parallel()
+
 	tt := []struct {
 		line     *modfile.Line
 		expected bool
@@ -61,6 +63,8 @@ func TestIsTest(t *testing.T) {
 }
 
 func TestSetTest(t *testing.T) {
+	t.Parallel()
+
 	tt := []struct {
 		line     *modfile.Line
 		expected string

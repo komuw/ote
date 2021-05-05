@@ -7,6 +7,8 @@ import (
 )
 
 func Test_fetchImports(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		file string
@@ -25,6 +27,7 @@ func Test_fetchImports(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 
 			got, err := fetchImports(tt.file)
@@ -35,6 +38,8 @@ func Test_fetchImports(t *testing.T) {
 }
 
 func Test_fetchModule(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name       string
 		root       string
@@ -74,6 +79,7 @@ func Test_fetchModule(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 
 			got, err := fetchModule(tt.root, tt.importPath)
@@ -84,6 +90,8 @@ func Test_fetchModule(t *testing.T) {
 }
 
 func Test_getAllmodules(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name               string
 		testImportPaths    []string
@@ -120,6 +128,7 @@ func Test_getAllmodules(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 
 			gotTestModules, gotNonTestModules, err := getAllmodules(tt.testImportPaths, tt.nonTestImportPaths, tt.root)
@@ -131,6 +140,8 @@ func Test_getAllmodules(t *testing.T) {
 }
 
 func Test_getTestModules(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		root string
@@ -169,6 +180,7 @@ func Test_getTestModules(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 
 			got, err := getTestModules(tt.root)
@@ -179,6 +191,8 @@ func Test_getTestModules(t *testing.T) {
 }
 
 func Test_isStdLibPkg(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		pkg  string
@@ -200,6 +214,7 @@ func Test_isStdLibPkg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := qt.New(t)
 
 			got, err := isStdLibPkg(tt.pkg, tt.std)
