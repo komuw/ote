@@ -6,28 +6,6 @@ import (
 	qt "github.com/frankban/quicktest"
 )
 
-func Test_loadStd(t *testing.T) {
-	tests := []struct {
-		name    string
-		wantErr bool
-	}{
-		{name: "run", wantErr: false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := qt.New(t)
-			err := loadStd()
-			c.Assert(err, qt.IsNil)
-
-			got := isStdLibPkg("archive/tar")
-			c.Assert(got, qt.IsTrue)
-
-			got2 := isStdLibPkg("nonExistent")
-			c.Assert(got2, qt.IsFalse)
-		})
-	}
-}
-
 func Test_fetchImports(t *testing.T) {
 	tests := []struct {
 		name string
@@ -48,9 +26,6 @@ func Test_fetchImports(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := qt.New(t)
-
-			//  load std libs
-			loadStd()
 
 			got, err := fetchImports(tt.file)
 			c.Assert(err, qt.IsNil)
@@ -196,12 +171,40 @@ func Test_getTestModules(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := qt.New(t)
 
-			//  load std libs
-			loadStd()
-
 			got, err := getTestModules(tt.root)
 			c.Assert(err, qt.IsNil)
 			c.Assert(got, qt.DeepEquals, tt.want)
+		})
+	}
+}
+
+func Test_isStdLibPkg(t *testing.T) {
+	tests := []struct {
+		name string
+		pkg  string
+		std  string
+		want bool
+	}{
+		{
+			name: "fmt ok",
+			pkg:  "fmt",
+			std:  stdlib,
+			want: true,
+		},
+		{
+			name: "bogus package",
+			pkg:  "bogusPkg",
+			std:  stdlib,
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := qt.New(t)
+
+			got, err := isStdLibPkg(tt.pkg, tt.std)
+			c.Assert(err, qt.IsNil)
+			c.Assert(got, qt.Equals, tt.want)
 		})
 	}
 }
