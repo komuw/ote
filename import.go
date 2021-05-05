@@ -118,10 +118,14 @@ func fetchModule(root, importPath string) (string, error) {
 
 	pkg := pkgs[0]
 	if pkg.Module == nil {
-		// this can be raised if an import path is inside a file that has some build tag
-		// that ote didn't take into account.
-		// see: https://github.com/komuw/ote/issues/3
-		return "", fmt.Errorf("import %s does not belong to any module", importPath)
+		if len(pkg.Errors) > 0 {
+			return "", fmt.Errorf("unable to find module for import %s : %s", importPath, pkg.Errors[0].Msg)
+		} else {
+			// this can be raised if an import path is inside a file that has some build tag
+			// that ote didn't take into account.
+			// see: https://github.com/komuw/ote/issues/3
+			return "", fmt.Errorf("import %s does not belong to any module", importPath)
+		}
 	}
 
 	mRequire := modfile.Require{
