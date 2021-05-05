@@ -8,6 +8,12 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
+// The tests in this file cannot be ran in parallel with each other
+// ie, no t.Parallel()
+// This is because `modfile.File` is not safe for concurrent use.
+// https://pkg.go.dev/golang.org/x/mod@v0.4.2/modfile#File
+// Adding t.Parallel() here leads to the race detector not been happy
+
 func Test_getModFile(t *testing.T) {
 	tests := []struct {
 		name      string
