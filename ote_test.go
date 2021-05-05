@@ -128,7 +128,7 @@ require (
 			name:     "testdata/mod5",
 			fp:       "testdata/mod5",
 			readonly: true,
-			wantErr:  false,
+			wantErr:  true,
 			want:     `TODO`,
 		},
 
@@ -141,6 +141,8 @@ require (
 		},
 	}
 	for _, tt := range tests {
+		tt := tt // capture range variable
+
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
