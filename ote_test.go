@@ -125,6 +125,14 @@ require (
 		},
 
 		{
+			name:     "testdata/mod5",
+			fp:       "testdata/mod5",
+			readonly: true,
+			wantErr:  false,
+			want:     `TODO`,
+		},
+
+		{
 			name:     "testdata/nonExistentPackage",
 			fp:       "testdata/nonExistentPackage",
 			readonly: true,
