@@ -125,6 +125,12 @@ require (
 		},
 
 		{
+			// TODO: This module should actually not raise an error.
+			// It should succeed.
+			// This should be fixed in:
+			// https://github.com/komuw/ote/issues/3
+			// https://github.com/komuw/ote/issues/27
+			// We should update this test when those issues are solved
 			name:     "testdata/mod5",
 			fp:       "testdata/mod5",
 			readonly: true,
