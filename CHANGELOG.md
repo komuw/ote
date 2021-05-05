@@ -15,6 +15,7 @@ Most recent version is listed first.
   This is an improvement of https://github.com/komuw/ote/pull/24
 - call `fetchModule` only for the import paths that are not shared between test files and non-test files: https://github.com/komuw/ote/pull/26
 - add more tests: https://github.com/komuw/ote/pull/29
+- run tests in parallel: https://github.com/komuw/ote/pull/30
 
 
 ## v0.0.3
