@@ -153,7 +153,7 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 		}
 	}
 	testOnlyImportPaths := difference(testImportPaths, existsInBoth)
-	nonTestOnlyImportPaths := difference(nonTestImportPaths, existsInBoth)
+	// nonTestOnlyImportPaths := difference(nonTestImportPaths, existsInBoth)
 
 	// todo: these two for loops can be made concurrent.
 
@@ -165,15 +165,15 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 		testModules = append(testModules, m)
 	}
 
-	for _, v := range nonTestOnlyImportPaths {
-		m, errF := fetchModule(root, v)
-		if errF != nil {
-			return testModules, nonTestModules, errF
-		}
-		nonTestModules = append(nonTestModules, m)
-	}
+	// for _, v := range nonTestOnlyImportPaths {
+	// 	m, errF := fetchModule(root, v)
+	// 	if errF != nil {
+	// 		return testModules, nonTestModules, errF
+	// 	}
+	// 	nonTestModules = append(nonTestModules, m)
+	// }
 
-	return dedupe(testModules), dedupe(nonTestModules), nil
+	return dedupe(testModules), nonTestModules, nil
 }
 
 func getTestModules(root string) ([]string, error) {
@@ -225,11 +225,11 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	testModules, nonTestModules, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
+	testModules, _, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
 	if err != nil {
 		return []string{}, err
 	}
-	trueTestModules := difference(testModules, nonTestModules)
+	trueTestModules := testModules // difference(testModules, nonTestModules)
 
 	return trueTestModules, nil
 }
