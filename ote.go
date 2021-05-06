@@ -29,7 +29,12 @@ import (
 //    export export GOPACKAGESDEBUG=true && \
 //    go run . -f testdata/mod1/ -r
 func main() {
-	f, r := cli()
+	f, r, v := cli()
+	if v {
+		// show version
+		fmt.Println(version())
+		return
+	}
 
 	err := run(f, os.Stdout, r)
 	if err != nil {
@@ -62,28 +67,26 @@ func run(fp string, w io.Writer, readonly bool) error {
 	return nil
 }
 
-func cli() (string, bool) {
+func cli() (string, bool, bool) {
+	var v bool
 	var f string
 	var r bool
 
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(),
 			`ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
+
 Usage:
--f string
-	path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
--r	
-        (readonly) write to stdout instead of updating go.mod file.
+-f string # path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
+-r bool   # (readonly) write to stdout instead of updating go.mod file.
+-v bool   # display version of ote in use.
+
 examples:
-	ote .
-		update go.mod in the current directory
-	ote -f /tmp/myPkg
-		update go.mod in the /tmp/myPkg directory
-	ote -r
-		(readonly) write to stdout instead of updating go.mod file.
-	ote -f /tmp/myPkg -r
-	        (readonly) write to stdout instead of updating go.mod file in the /tmp/myPkg directory.
-	`)
+	ote .                  # update go.mod in the current directory
+	ote -f /tmp/myPkg      # update go.mod in the /tmp/myPkg directory
+	ote -r                 # (readonly) write to stdout instead of updating go.mod file.
+	ote -f /tmp/myPkg -r   # (readonly) write to stdout instead of updating go.mod file in the /tmp/myPkg directory.
+`)
 	}
 	flag.StringVar(
 		&f,
@@ -95,7 +98,12 @@ examples:
 		"r",
 		false,
 		"(readonly) display how the updated go.mod file would look like, without actually updating the file.")
+	flag.BoolVar(
+		&v,
+		"v",
+		false,
+		"display version of ote in use.")
 	flag.Parse()
 
-	return f, r
+	return f, r, v
 }
