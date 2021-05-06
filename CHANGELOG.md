@@ -2,6 +2,11 @@
 
 Most recent version is listed first.  
 
+
+## v0.0.5
+- Add version in cli: https://github.com/komuw/ote/pull/34
+
+
 ## v0.0.4
 - rewrite how `ote` is implemented: https://github.com/komuw/ote/pull/18
   Get all the golang files in a project, parse them, get imports

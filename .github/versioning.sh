@@ -23,8 +23,30 @@ if [ "$VERSION" == "versionNotSet"  ]; then
     exit
 fi
 
+create_version_go_file() {
+    printf "\n creating/updating version.go \n"
 
-printf "\n creating git tag: ${VERSION} \n"
-printf "\n with commit message, see Changelong: https://github.com/komuw/ote/blob/main/CHANGELOG.md \n" && \
-  git tag -a "${VERSION}" -m "see Changelong: https://github.com/komuw/ote/blob/main/CHANGELOG.md"
-printf "\n git push the tag::\n" && git push --all -u --follow-tags
+    rm -rf ./version.go
+    printf "package main
+
+            func version() string {
+                return \`ote ${VERSION}\`
+            }" >> ./version.go
+
+    gofumpt -s -w ./version.go
+
+    printf "\n committing version.go to git \n"
+    git add ./version.go
+    git commit -m "update version.go"
+}
+
+
+
+create_tag() {
+    printf "\n creating git tag: ${VERSION} \n"
+    printf "\n with commit message, see Changelong: https://github.com/komuw/ote/blob/main/CHANGELOG.md \n" && \
+    git tag -a "${VERSION}" -m "see Changelong: https://github.com/komuw/ote/blob/main/CHANGELOG.md"
+    printf "\n git push the tag::\n" && git push --all -u --follow-tags
+}
+
+create_version_go_file && create_tag
