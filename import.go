@@ -138,7 +138,7 @@ func fetchModule(root, importPath string) (string, error) {
 	return pkg.Module.Path, nil
 }
 
-func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, nonTestModules []string, err error) {
+func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, err error) {
 	// There could be some import paths that exist in both test files & non-test files.
 	// In hashicorp/nomad we found that to be about 50% of imports.
 	// In juju/juju it is about 80%
@@ -153,27 +153,16 @@ func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root s
 		}
 	}
 	testOnlyImportPaths := difference(testImportPaths, existsInBoth)
-	// nonTestOnlyImportPaths := difference(nonTestImportPaths, existsInBoth)
-
-	// todo: these two for loops can be made concurrent.
 
 	for _, v := range testOnlyImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
-			return testModules, nonTestModules, errF
+			return testModules, errF
 		}
 		testModules = append(testModules, m)
 	}
 
-	// for _, v := range nonTestOnlyImportPaths {
-	// 	m, errF := fetchModule(root, v)
-	// 	if errF != nil {
-	// 		return testModules, nonTestModules, errF
-	// 	}
-	// 	nonTestModules = append(nonTestModules, m)
-	// }
-
-	return dedupe(testModules), nonTestModules, nil
+	return dedupe(testModules), nil
 }
 
 func getTestModules(root string) ([]string, error) {
@@ -225,7 +214,7 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	testModules, _, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
+	testModules, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
 	if err != nil {
 		return []string{}, err
 	}
