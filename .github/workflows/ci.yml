@@ -224,7 +224,7 @@ jobs:
           fi
 
           num_juju_test_modules=$(./ote -r -f stuff_to_test/juju | grep '// test' | wc -l | tr -d ' ')
-          if [ "$num_juju_test_modules" != "4" ]; then
+          if [ "$num_juju_test_modules" != "9" ]; then
             printf "\n\t wrong number of test comments reported for juju/juju. reported: ${num_juju_test_modules}  \n" && \
             exit 77
           fi
