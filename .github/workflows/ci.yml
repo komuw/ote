@@ -200,14 +200,14 @@ jobs:
         with:
           repository: hashicorp/nomad
           ref: v1.1.0-beta1
-          path: stuff_to_test/
+          path: stuff_to_test/nomad
 
       - name: Checkout juju/juju
         uses: actions/checkout@v2
         with:
           repository: juju/juju
           ref: juju-2.9.0
-          path: stuff_to_test/
+          path: stuff_to_test/juju
 
       - name: do acceptance
         run: |
