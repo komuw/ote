@@ -178,6 +178,45 @@ jobs:
 
           # TODO: add https://github.com/system-pclub/GCatch
 
+  do_acceptance:
+    name: do_acceptance
+    timeout-minutes: 3
+    strategy:
+      matrix:
+        go-version: [1.16]
+        platform: [ubuntu-18.04]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.16
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Checkout hashicorp/nomad
+        uses: actions/checkout@v2
+        with:
+          repository: hashicorp/nomad
+          ref: v1.1.0-beta1
+          path: stuff_to_test/
+
+      - name: Checkout juju/juju
+        uses: actions/checkout@v2
+        with:
+          repository: juju/juju
+          ref: juju-2.9.0
+          path: stuff_to_test/
+
+      - name: do acceptance
+        run: |
+          set -x
+
+          ls -lsha stuff_to_test/
+          go build -trimpath --race -o ote . && /usr/bin/time -lp ./ote -r -f stuff_to_test/nomad/
+
+
   # run_stress_test:
   #   name: run_stress_test
   #   timeout-minutes: 2
