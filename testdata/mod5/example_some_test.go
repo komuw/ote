@@ -8,7 +8,6 @@ import (
 )
 
 func Example_HookAPi() {
-
 	_, _ = slhooks.NewSyslogHook("udp", "localhost:514", syslog.LOG_INFO, "")
 
 	myHook.HookAPi()
