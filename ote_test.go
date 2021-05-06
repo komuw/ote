@@ -166,3 +166,34 @@ require (
 		})
 	}
 }
+
+func Test_cli(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		file     string
+		readonly bool
+		version  bool
+	}{
+		{
+			name:     "current directory",
+			file:     ".",
+			readonly: false,
+			version:  false,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt // capture range variable
+
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			c := qt.New(t)
+
+			f, r, v := cli()
+			c.Assert(f, qt.Equals, tt.file)
+			c.Assert(r, qt.Equals, tt.readonly)
+			c.Assert(v, qt.Equals, tt.version)
+		})
+	}
+}
