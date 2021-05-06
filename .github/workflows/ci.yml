@@ -216,8 +216,8 @@ jobs:
           ls -lsha stuff_to_test/
           go build -trimpath --race -o ote .
           
-          /usr/bin/time -apvV ./ote -r -f stuff_to_test/nomad/
-          /usr/bin/time -apvV ./ote -r -f stuff_to_test/juju
+          /usr/bin/time -apv ./ote -r -f stuff_to_test/nomad/
+          /usr/bin/time -apv ./ote -r -f stuff_to_test/juju
 
 
   # run_stress_test:
