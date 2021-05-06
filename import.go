@@ -138,7 +138,7 @@ func fetchModule(root, importPath string) (string, error) {
 	return pkg.Module.Path, nil
 }
 
-func getAllmodules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, err error) {
+func getAllTestModules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, err error) {
 	// There could be some import paths that exist in both test files & non-test files.
 	// In hashicorp/nomad we found that to be about 50% of imports.
 	// In juju/juju it is about 80%
@@ -214,7 +214,7 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	testModules, err := getAllmodules(testImportPaths, nonTestImportPaths, root)
+	testModules, err := getAllTestModules(testImportPaths, nonTestImportPaths, root)
 	if err != nil {
 		return []string{}, err
 	}

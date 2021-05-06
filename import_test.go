@@ -93,7 +93,7 @@ func Test_fetchModule(t *testing.T) {
 	}
 }
 
-func Test_getAllmodules(t *testing.T) {
+func Test_getAllTestModules(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -133,7 +133,7 @@ func Test_getAllmodules(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
 
-			gotTestModules, err := getAllmodules(tt.testImportPaths, tt.nonTestImportPaths, tt.root)
+			gotTestModules, err := getAllTestModules(tt.testImportPaths, tt.nonTestImportPaths, tt.root)
 			c.Assert(err, qt.IsNil)
 			c.Assert(gotTestModules, qt.DeepEquals, tt.wantTestModules)
 		})
