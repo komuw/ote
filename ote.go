@@ -77,14 +77,14 @@ func cli() (string, bool, bool) {
 			`ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
 
 Usage:
--f string # path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
--r bool   # (readonly) write to stdout instead of updating go.mod file.
--v bool   # display version of ote in use.
+-f string  # path to directory containing the go.mod file. By default, it uses the current directory. (default ".")
+-r bool    # (readonly) write to stdout instead of updating go.mod file.
+-v bool    # display version of ote in use.
 
 examples:
-	ote .                  # update go.mod in the current directory
+	ote .                    # update go.mod in the current directory
 	ote -f /tmp/someDir      # update go.mod in the /tmp/someDir directory
-	ote -r                 # (readonly) write to stdout instead of updating go.mod file.
+	ote -r                   # (readonly) write to stdout instead of updating go.mod file.
 	ote -f /tmp/someDir -r   # (readonly) write to stdout instead of updating go.mod file in the /tmp/someDir directory.
 `)
 	}
