@@ -58,8 +58,35 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 	return nil
 }
 
+func addTestRequirements(f *modfile.File) {
+	// Add a new require block after the last "require".
+	// This new block will house test-only requirements
+	// eg.
+	/*
+		require (
+				github.com/fatih/color v1.12.0 // test
+				github.com/frankban/quicktest v1.12.1 // test
+				github.com/go-xorm/builder v0.3.4 // test
+			)
+	*/
+
+	newTestBlock := &modfile.LineBlock{
+		Token: []string{"require"},
+		Line: []*modfile.Line{
+			&modfile.Line{Token: []string{"github.com/fatih/color", "v1.12.0", "// test"}},
+			&modfile.Line{Token: []string{"github.com/go-xorm/builder", "v0.3.4", "// test"}},
+			&modfile.Line{Token: []string{"github.com/frankban/quicktest", "v1.12.1", "// test"}},
+		},
+	}
+
+	f.Syntax.Stmt = append(f.Syntax.Stmt, newTestBlock)
+	f.Syntax.Cleanup()
+}
+
 // writeMod updates the on-disk modfile
 func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
+	addTestRequirements(f)
+
 	f.SortBlocks()
 	f.Cleanup()
 
