@@ -34,12 +34,14 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		return nil
 	}
 
+	testLines := []*modfile.Line{}
 	for _, ni := range trueTestModules {
 		for _, fr := range f.Require {
 			if ni == fr.Mod.Path {
 				// add test comment
 				line := fr.Syntax
 				setTest(line, true)
+				testLines = append(testLines, line)
 			}
 		}
 	}
@@ -55,10 +57,12 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		}
 	}
 
+	addTestRequireBlock(f, testLines)
+
 	return nil
 }
 
-func addTestRequirements(f *modfile.File) {
+func addTestRequireBlock(f *modfile.File, testLines []*modfile.Line) {
 	// Add a new require block after the last "require".
 	// This new block will house test-only requirements
 	// eg.
@@ -70,14 +74,25 @@ func addTestRequirements(f *modfile.File) {
 			)
 	*/
 
+	if len(testLines) <= 0 {
+		return
+	}
+
 	newTestBlock := &modfile.LineBlock{
 		Token: []string{"require"},
-		Line: []*modfile.Line{
-			&modfile.Line{Token: []string{"github.com/fatih/color", "v1.12.0", "// test"}},
-			&modfile.Line{Token: []string{"github.com/go-xorm/builder", "v0.3.4", "// test"}},
-			&modfile.Line{Token: []string{"github.com/frankban/quicktest", "v1.12.1", "// test"}},
-		},
+		Line:  testLines,
+		// Line: []*modfile.Line{
+		// 	&modfile.Line{Token: []string{"github.com/fatih/color", "v1.12.0", "// test"}},
+		// 	&modfile.Line{Token: []string{"github.com/go-xorm/builder", "v0.3.4", "// test"}},
+		// 	&modfile.Line{Token: []string{"github.com/frankban/quicktest", "v1.12.1", "// test"}},
+		// },
 	}
+
+	// for _, t := range tst {
+	// 	// since test-only deps are in their own require blocks,
+	// 	// drop them from the main one.
+	// 	f.DropRequire(t)
+	// }
 
 	f.Syntax.Stmt = append(f.Syntax.Stmt, newTestBlock)
 	f.Syntax.Cleanup()
@@ -85,7 +100,6 @@ func addTestRequirements(f *modfile.File) {
 
 // writeMod updates the on-disk modfile
 func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
-	addTestRequirements(f)
 
 	f.SortBlocks()
 	f.Cleanup()
