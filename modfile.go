@@ -12,7 +12,7 @@ import (
 type lineMod struct {
 	name string
 	ver  string
-	com  string
+	coms modfile.Comments
 }
 
 func getModFile(gomodFile string) (*modfile.File, error) {
@@ -47,7 +47,7 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 				// add test comment
 				line := fr.Syntax
 				setTest(line, true)
-				lineMods = append(lineMods, lineMod{name: line.Token[0], ver: line.Token[1], com: testComment})
+				lineMods = append(lineMods, lineMod{name: line.Token[0], ver: line.Token[1], coms: line.Comments})
 			}
 		}
 	}
@@ -90,7 +90,10 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 
 	testLines := []*modfile.Line{}
 	for _, y := range lineMods {
-		testLines = append(testLines, &modfile.Line{Token: []string{y.name, y.ver, y.com}})
+		testLines = append(testLines, &modfile.Line{
+			Token:    []string{y.name, y.ver},
+			Comments: y.coms,
+		})
 	}
 	newTestBlock := &modfile.LineBlock{
 		Token: []string{"require"},
