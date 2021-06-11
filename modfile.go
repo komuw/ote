@@ -78,14 +78,14 @@ func addTestRequireBlock(f *modfile.File, testLines []*modfile.Line) {
 		return
 	}
 
-	type aha struct {
+	type lineMod struct {
 		name string
 		ver  string
 		com  string
 	}
-	yes := []aha{}
+	yes := []lineMod{}
 	for _, t := range testLines {
-		yes = append(yes, aha{name: t.Token[0], ver: t.Token[1], com: testComment})
+		yes = append(yes, lineMod{name: t.Token[0], ver: t.Token[1], com: testComment})
 	}
 
 	for _, y := range yes {
