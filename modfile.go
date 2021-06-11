@@ -78,21 +78,38 @@ func addTestRequireBlock(f *modfile.File, testLines []*modfile.Line) {
 		return
 	}
 
+	type aha struct {
+		name    string
+		ver     string
+		comment string
+	}
+	yes := []aha{}
+	for _, t := range testLines {
+		yes = append(yes, aha{name: t.Token[0], ver: t.Token[1], comment: "// test"})
+	}
+
+	for _, y := range yes {
+		// since test-only deps are in their own require blocks,
+		// drop them from the main one.
+		f.DropRequire(y.name)
+	}
+
+	xx := []*modfile.Line{}
+	for _, y := range yes {
+		xx = append(xx,
+			&modfile.Line{Token: []string{y.name, y.ver, y.comment}},
+		)
+	}
+
 	newTestBlock := &modfile.LineBlock{
 		Token: []string{"require"},
-		Line:  testLines,
+		Line:  xx,
 		// Line: []*modfile.Line{
 		// 	&modfile.Line{Token: []string{"github.com/fatih/color", "v1.12.0", "// test"}},
 		// 	&modfile.Line{Token: []string{"github.com/go-xorm/builder", "v0.3.4", "// test"}},
 		// 	&modfile.Line{Token: []string{"github.com/frankban/quicktest", "v1.12.1", "// test"}},
 		// },
 	}
-
-	// for _, t := range tst {
-	// 	// since test-only deps are in their own require blocks,
-	// 	// drop them from the main one.
-	// 	f.DropRequire(t)
-	// }
 
 	f.Syntax.Stmt = append(f.Syntax.Stmt, newTestBlock)
 	f.Syntax.Cleanup()
