@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"testing"
 
 	qt "github.com/frankban/quicktest"
@@ -171,13 +170,6 @@ require github.com/benweissmann/memongo v0.1.1 // test
 			}
 
 			got := w.String()
-
-			fmt.Println()
-			fmt.Println()
-			t.Log(got)
-			fmt.Println()
-			fmt.Println()
-
 			c.Assert(got, qt.Equals, tt.want)
 		})
 	}
