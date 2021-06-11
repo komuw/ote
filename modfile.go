@@ -76,7 +76,6 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 		require (
 				github.com/fatih/color v1.12.0 // test
 				github.com/frankban/quicktest v1.12.1 // test
-				github.com/go-xorm/builder v0.3.4 // test
 			)
 	*/
 
