@@ -30,7 +30,7 @@ func getModFile(gomodFile string) (*modfile.File, error) {
 
 // updateMod updates the in-memory modfile
 func updateMod(trueTestModules []string, f *modfile.File) error {
-	if len(trueTestModules) < 0 {
+	if len(trueTestModules) <= 0 {
 		// if there are no test dependencies, we need to go through all the deps and
 		// remove any test comments that there may be there.
 		for _, fr := range f.Require {
