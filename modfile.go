@@ -9,6 +9,12 @@ import (
 	"golang.org/x/mod/modfile"
 )
 
+type lineMod struct {
+	name string
+	ver  string
+	com  string
+}
+
 func getModFile(gomodFile string) (*modfile.File, error) {
 	modContents, err := os.ReadFile(filepath.Clean(gomodFile))
 	if err != nil {
@@ -34,14 +40,14 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		return nil
 	}
 
-	testLines := []*modfile.Line{}
+	lineMods := []lineMod{}
 	for _, ni := range trueTestModules {
 		for _, fr := range f.Require {
 			if ni == fr.Mod.Path {
 				// add test comment
 				line := fr.Syntax
 				setTest(line, true)
-				testLines = append(testLines, line)
+				lineMods = append(lineMods, lineMod{name: line.Token[0], ver: line.Token[1], com: testComment})
 			}
 		}
 	}
@@ -57,12 +63,12 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		}
 	}
 
-	addTestRequireBlock(f, testLines)
+	addTestRequireBlock(f, lineMods)
 
 	return nil
 }
 
-func addTestRequireBlock(f *modfile.File, testLines []*modfile.Line) {
+func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 	// Add a new require block after the last "require".
 	// This new block will house test-only requirements
 	// eg.
@@ -74,53 +80,31 @@ func addTestRequireBlock(f *modfile.File, testLines []*modfile.Line) {
 			)
 	*/
 
-	if len(testLines) <= 0 {
+	if len(lineMods) <= 0 {
 		return
 	}
-
-	type lineMod struct {
-		name string
-		ver  string
-		com  string
-	}
-	yes := []lineMod{}
-	for _, t := range testLines {
-		yes = append(yes, lineMod{name: t.Token[0], ver: t.Token[1], com: testComment})
-	}
-
-	for _, y := range yes {
+	for _, y := range lineMods {
 		// since test-only deps are in their own require blocks,
 		// drop them from the main one.
 		f.DropRequire(y.name)
 	}
 
-	xx := []*modfile.Line{}
-	for _, y := range yes {
-		xx = append(xx,
-			&modfile.Line{Token: []string{y.name, y.ver, y.com}},
-		)
+	testLines := []*modfile.Line{}
+	for _, y := range lineMods {
+		testLines = append(testLines, &modfile.Line{Token: []string{y.name, y.ver, y.com}})
 	}
-
 	newTestBlock := &modfile.LineBlock{
 		Token: []string{"require"},
-		Line:  xx,
-		// Line: []*modfile.Line{
-		// 	&modfile.Line{Token: []string{"github.com/fatih/color", "v1.12.0", "// test"}},
-		// 	&modfile.Line{Token: []string{"github.com/go-xorm/builder", "v0.3.4", "// test"}},
-		// 	&modfile.Line{Token: []string{"github.com/frankban/quicktest", "v1.12.1", "// test"}},
-		// },
+		Line:  testLines,
 	}
-
 	f.Syntax.Stmt = append(f.Syntax.Stmt, newTestBlock)
 	f.Syntax.Cleanup()
 }
 
 // writeMod updates the on-disk modfile
 func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) error {
-
 	f.SortBlocks()
 	f.Cleanup()
-
 	b, errF := f.Format()
 	if errF != nil {
 		return errF
