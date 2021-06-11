@@ -85,7 +85,7 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 	for _, y := range lineMods {
 		// since test-only deps are in their own require blocks,
 		// drop them from the main one.
-		f.DropRequire(y.name)
+		_ = f.DropRequire(y.name)
 	}
 
 	testLines := []*modfile.Line{}
