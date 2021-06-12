@@ -41,16 +41,16 @@ require (
 	rsc.io/quote v1.5.2
 )
 
+require (
+	github.com/frankban/quicktest v1.12.1 // test
+	github.com/shirou/gopsutil v2.20.9+incompatible // test; PriorComment
+)
+
 exclude golang.org/x/net v1.2.3
 
 retract (
 	v1.0.1 // Contains retractions only.
 	v1.0.0 // Published accidentally.
-)
-
-require (
-	github.com/frankban/quicktest v1.12.1 // test
-	github.com/shirou/gopsutil v2.20.9+incompatible // test; PriorComment
 )
 
 `,
@@ -151,6 +151,30 @@ require github.com/benweissmann/memongo v0.1.1 // test
 			readonly: true,
 			wantErr:  "build constraints exclude all Go files in",
 			want:     ``,
+		},
+
+		{
+			name:     "testdata/mod6",
+			fp:       "testdata/mod6",
+			readonly: true,
+			wantErr:  "",
+			want: `module testdata/mod6
+
+go 1.16
+
+require (
+	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
+	github.com/go-ole/go-ole v1.2.5 // indirect
+	github.com/hashicorp/vault/api v1.1.0
+	github.com/pkg/errors v0.9.1
+)
+
+require (
+	github.com/shirou/gopsutil v3.21.5+incompatible // test
+	rsc.io/quote v1.5.2 // test
+)
+
+`,
 		},
 
 		{

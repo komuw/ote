@@ -5,6 +5,7 @@ Most recent version is listed first.
 
 ## v0.0.7
 - List test-only dependencies in their own require block: https://github.com/komuw/ote/pull/37
+- The require block of test-only dependencies should only be inserted after the last require block: https://github.com/komuw/ote/pull/39
 
 
 ## v0.0.6
