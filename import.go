@@ -112,7 +112,7 @@ func fetchModule(root, importPath string) (string, error) {
 	if len(pkgs) > 1 {
 		return "", fmt.Errorf("import %s produced greater than 1 packages", importPath)
 	}
-	if len(pkgs) < 0 {
+	if len(pkgs) <= 0 {
 		return "", fmt.Errorf("import %s does not belong to any package", importPath)
 	}
 

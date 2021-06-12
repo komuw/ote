@@ -3,6 +3,10 @@
 Most recent version is listed first.  
 
 
+## v0.0.7
+- List test-only dependencies in their own require block: https://github.com/komuw/ote/pull/37
+
+
 ## v0.0.6
 - Remove unnecessary loop, so as to improve perfomance: https://github.com/komuw/ote/pull/33
 

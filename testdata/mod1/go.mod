@@ -17,3 +17,10 @@ require (
 	golang.org/x/sys v0.0.0-20210426230700-d19ff857e887
 	rsc.io/quote v1.5.2
 )
+
+exclude golang.org/x/net v1.2.3
+
+retract (
+	v1.0.1 // Contains retractions only.
+	v1.0.0 // Published accidentally.
+)
