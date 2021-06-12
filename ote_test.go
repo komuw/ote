@@ -154,6 +154,18 @@ require github.com/benweissmann/memongo v0.1.1 // test
 		},
 
 		{
+			name:     "testdata/mod6",
+			fp:       "testdata/mod6",
+			readonly: true,
+			wantErr:  "",
+			want: `module testdata/mod6
+
+go 1.16
+
+`,
+		},
+
+		{
 			name:     "testdata/nonExistentPackage",
 			fp:       "testdata/nonExistentPackage",
 			readonly: true,
