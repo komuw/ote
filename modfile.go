@@ -79,6 +79,46 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 			)
 	*/
 
+	findLastRequire := func(f *modfile.File) int {
+		// TODO: add attribution to github.com/golang/mod
+		var pos int
+
+		for i, stmt := range f.Syntax.Stmt {
+			switch stmt := stmt.(type) {
+			case *modfile.Line:
+				if len(stmt.Token) == 0 || stmt.Token[0] != "require" {
+					continue
+				}
+				pos = i
+			case *modfile.LineBlock:
+				if len(stmt.Token) == 0 || stmt.Token[0] != "require" {
+					continue
+				}
+				pos = i
+			}
+		}
+
+		return pos
+	}
+
+	insertAt := func(slice []modfile.Expr, index int, value *modfile.LineBlock) []modfile.Expr {
+		/*
+			Insert inserts the value into the slice at the specified index,
+			which must be in range.
+			The slice must have room for the new element.
+			from: https://blog.golang.org/slices
+		*/
+
+		// Grow the slice by one element.
+		slice = slice[0 : len(slice)+1]
+		// Use copy to move the upper part of the slice out of the way and open a hole.
+		copy(slice[index+1:], slice[index:])
+		// Store the new value.
+		slice[index] = value
+		// Return the result.
+		return slice
+	}
+
 	if len(lineMods) <= 0 {
 		return
 	}
@@ -99,7 +139,8 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 		Token: []string{"require"},
 		Line:  testLines,
 	}
-	f.Syntax.Stmt = append(f.Syntax.Stmt, newTestBlock)
+	index := findLastRequire(f) + 1
+	f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, newTestBlock)
 	f.Syntax.Cleanup()
 }
 
