@@ -105,17 +105,11 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 		/*
 			Insert inserts the value into the slice at the specified index,
 			which must be in range.
-			The slice must have room for the new element.
-			from: https://blog.golang.org/slices
+			from: https://github.com/golang/go/wiki/SliceTricks#insert
 		*/
-
-		// Grow the slice by one element.
-		slice = slice[0 : len(slice)+1]
-		// Use copy to move the upper part of the slice out of the way and open a hole.
+		slice = append(slice, nil /* use the zero value of the element type */)
 		copy(slice[index+1:], slice[index:])
-		// Store the new value.
 		slice[index] = value
-		// Return the result.
 		return slice
 	}
 
