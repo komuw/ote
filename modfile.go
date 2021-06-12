@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -47,7 +48,15 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 				// add test comment
 				line := fr.Syntax
 				setTest(line, true)
-				lineMods = append(lineMods, lineMod{name: line.Token[0], ver: line.Token[1], coms: line.Comments})
+				if len(line.Token) == 2 {
+					// eg; `github.com/shirou/gopsutil v1.21.5`
+					lineMods = append(lineMods, lineMod{name: line.Token[0], ver: line.Token[1], coms: line.Comments})
+				} else if len(line.Token) == 3 {
+					// eg; `require rsc.io/quote v1.5.2`
+					lineMods = append(lineMods, lineMod{name: line.Token[1], ver: line.Token[2], coms: line.Comments})
+				} else {
+					return errors.New("unrecognised line.Token format")
+				}
 			}
 		}
 	}
