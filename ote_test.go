@@ -41,6 +41,13 @@ require (
 	rsc.io/quote v1.5.2
 )
 
+exclude golang.org/x/net v1.2.3
+
+retract (
+	v1.0.1 // Contains retractions only.
+	v1.0.0 // Published accidentally.
+)
+
 require (
 	github.com/frankban/quicktest v1.12.1 // test
 	github.com/shirou/gopsutil v2.20.9+incompatible // test; PriorComment
