@@ -3,6 +3,10 @@
 Most recent version is listed first.  
 
 
+## v0.0.8
+- Bugfix, do not let build tags impact the source files that are scanned: https://github.com/komuw/ote/pull/41
+
+
 ## v0.0.7
 - List test-only dependencies in their own require block: https://github.com/komuw/ote/pull/37
 - The require block of test-only dependencies should only be inserted after the last require block: https://github.com/komuw/ote/pull/39
