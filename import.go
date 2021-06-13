@@ -10,8 +10,6 @@ import (
 	"strings"
 	"sync"
 
-	"golang.org/x/mod/modfile"
-	"golang.org/x/mod/module"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -115,13 +113,6 @@ func fetchModule(root, importPath string) (string, error) {
 			return "", fmt.Errorf("import %s does not belong to any module", importPath)
 		}
 	}
-
-	mRequire := modfile.Require{
-		Mod:      module.Version{Path: pkg.Module.Path, Version: pkg.Module.Version},
-		Indirect: pkg.Module.Indirect,
-	}
-	// TODO: remove this
-	_ = mRequire
 
 	return pkg.Module.Path, nil
 }
