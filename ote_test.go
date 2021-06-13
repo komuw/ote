@@ -149,7 +149,7 @@ require github.com/benweissmann/memongo v0.1.1 // test
 			name:     "testdata/mod5",
 			fp:       "testdata/mod5",
 			readonly: true,
-			wantErr:  "build constraints exclude all Go files in",
+			wantErr:  "",
 			want:     ``,
 		},
 
