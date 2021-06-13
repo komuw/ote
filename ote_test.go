@@ -140,17 +140,25 @@ require github.com/benweissmann/memongo v0.1.1 // test
 		},
 
 		{
-			// TODO: This module should actually not raise an error.
-			// It should succeed.
-			// This should be fixed in:
-			// https://github.com/komuw/ote/issues/3
-			// https://github.com/komuw/ote/issues/27
-			// We should update this test when those issues are solved
 			name:     "testdata/mod5",
 			fp:       "testdata/mod5",
 			readonly: true,
-			wantErr:  "build constraints exclude all Go files in",
-			want:     ``,
+			wantErr:  "",
+			want: `module testdata/mod5
+
+go 1.16
+
+require (
+	github.com/cockroachdb/errors v1.8.4
+	github.com/kr/pretty v0.1.0
+)
+
+require (
+	github.com/sirupsen/logrus v1.8.1 // test
+	github.com/spf13/jwalterweatherman v1.0.0 // test
+)
+
+`,
 		},
 
 		{
