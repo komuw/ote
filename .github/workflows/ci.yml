@@ -181,7 +181,7 @@ jobs:
 
   do_acceptance:
     name: do_acceptance
-    timeout-minutes: 4
+    timeout-minutes: 5
     strategy:
       matrix:
         go-version: [1.16]
