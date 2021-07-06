@@ -219,7 +219,7 @@ jobs:
 
           RES=$(./ote -r -f stuff_to_test/nomad/)
           num_nomad_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
-          if [ "$num_nomad_test_modules" != "4" ]; then
+          if [ "$num_nomad_test_modules" != "3" ]; then
             printf "\n\t wrong number of test comments reported for hashicorp/nomad. reported: ${num_nomad_test_modules} \n" && \
             printf "\n\n" && \
             printf "$RES" && \
