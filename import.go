@@ -127,24 +127,6 @@ func getAllTestModules(testImportPaths []string, nonTestImportPaths []string, ro
 	// Given that, it then only makes sense to filter out this import paths that are common
 	// before calling fetchModule(which is one of the most expensive calls in ote)
 
-	/*
-		existsInBoth := []string{}
-		for _, a := range nonTestImportPaths {
-			if contains(testImportPaths, a) {
-				existsInBoth = append(existsInBoth, a)
-			}
-		}
-		testOnlyImportPaths := difference(testImportPaths, existsInBoth)
-
-		for _, v := range testOnlyImportPaths {
-			m, errF := fetchModule(root, v)
-			if errF != nil {
-				return testModules, errF
-			}
-			testModules = append(testModules, m)
-		}
-	*/
-
 	testOnlyMods := []string{}
 	for _, v := range testImportPaths {
 		m, errF := fetchModule(root, v)
