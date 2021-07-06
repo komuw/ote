@@ -126,21 +126,51 @@ func getAllTestModules(testImportPaths []string, nonTestImportPaths []string, ro
 	//
 	// Given that, it then only makes sense to filter out this import paths that are common
 	// before calling fetchModule(which is one of the most expensive calls in ote)
-	existsInBoth := []string{}
-	for _, a := range nonTestImportPaths {
-		if contains(testImportPaths, a) {
-			existsInBoth = append(existsInBoth, a)
-		}
-	}
-	testOnlyImportPaths := difference(testImportPaths, existsInBoth)
 
-	for _, v := range testOnlyImportPaths {
+	/*
+		existsInBoth := []string{}
+		for _, a := range nonTestImportPaths {
+			if contains(testImportPaths, a) {
+				existsInBoth = append(existsInBoth, a)
+			}
+		}
+		testOnlyImportPaths := difference(testImportPaths, existsInBoth)
+
+		for _, v := range testOnlyImportPaths {
+			m, errF := fetchModule(root, v)
+			if errF != nil {
+				return testModules, errF
+			}
+			testModules = append(testModules, m)
+		}
+	*/
+
+	testOnlyMods := []string{}
+	for _, v := range testImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
 			return testModules, errF
 		}
-		testModules = append(testModules, m)
+		testOnlyMods = append(testOnlyMods, m)
 	}
+
+	nonTestMods := []string{}
+	for _, v := range nonTestImportPaths {
+		m, errF := fetchModule(root, v)
+		if errF != nil {
+			return testModules, errF
+		}
+		nonTestMods = append(nonTestMods, m)
+	}
+
+	existsInBoth := []string{}
+	for _, a := range nonTestMods {
+		if contains(testOnlyMods, a) {
+			existsInBoth = append(existsInBoth, a)
+		}
+	}
+
+	testModules = difference(testOnlyMods, existsInBoth)
 
 	return dedupe(testModules), nil
 }
@@ -194,11 +224,10 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	testModules, err := getAllTestModules(testImportPaths, nonTestImportPaths, root)
+	trueTestModules, err := getAllTestModules(testImportPaths, nonTestImportPaths, root)
 	if err != nil {
 		return []string{}, err
 	}
-	trueTestModules := testModules // difference(testModules, nonTestModules)
 
 	return trueTestModules, nil
 }
