@@ -5,6 +5,8 @@ Most recent version is listed first.
 
 ## v0.0.8
 - Bugfix, do not let build tags impact the source files that are scanned: https://github.com/komuw/ote/pull/41
+- Bugfix, check whether modules are in both test and non-test files
+  previsously, we were checking whether import paths(as opposed to module paths) are in both test & non-test files: https://github.com/komuw/ote/pull/43
 
 
 ## v0.0.7
