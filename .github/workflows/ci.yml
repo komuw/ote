@@ -221,6 +221,9 @@ jobs:
           num_nomad_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
           if [ "$num_nomad_test_modules" != "4" ]; then
             printf "\n\t wrong number of test comments reported for hashicorp/nomad. reported: ${num_nomad_test_modules} \n" && \
+            printf "\n\n" && \
+            printf "$RES" && \
+            printf "\n\n" && \
             exit 77
           fi
 
@@ -228,6 +231,9 @@ jobs:
           num_juju_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
           if [ "$num_juju_test_modules" != "9" ]; then
             printf "\n\t wrong number of test comments reported for juju/juju. reported: ${num_juju_test_modules}  \n" && \
+            printf "\n\n" && \
+            printf "$RES" && \
+            printf "\n\n" && \
             exit 77
           fi
 
