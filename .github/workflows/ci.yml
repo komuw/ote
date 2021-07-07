@@ -181,7 +181,7 @@ jobs:
 
   do_acceptance:
     name: do_acceptance
-    timeout-minutes: 3
+    timeout-minutes: 8
     strategy:
       matrix:
         go-version: [1.16]
@@ -217,15 +217,23 @@ jobs:
           ls -lsha stuff_to_test/
           go build -trimpath -race -o ote .
 
-          num_nomad_test_modules=$(./ote -r -f stuff_to_test/nomad/ | grep '// test' | wc -l | tr -d ' ')
-          if [ "$num_nomad_test_modules" != "4" ]; then
+          RES=$(./ote -r -f stuff_to_test/nomad/)
+          num_nomad_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
+          if [ "$num_nomad_test_modules" != "3" ]; then
             printf "\n\t wrong number of test comments reported for hashicorp/nomad. reported: ${num_nomad_test_modules} \n" && \
+            printf "\n\n" && \
+            printf "$RES" && \
+            printf "\n\n" && \
             exit 77
           fi
 
-          num_juju_test_modules=$(./ote -r -f stuff_to_test/juju | grep '// test' | wc -l | tr -d ' ')
-          if [ "$num_juju_test_modules" != "9" ]; then
+          RES=$(./ote -r -f stuff_to_test/juju)
+          num_juju_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
+          if [ "$num_juju_test_modules" != "0" ]; then
             printf "\n\t wrong number of test comments reported for juju/juju. reported: ${num_juju_test_modules}  \n" && \
+            printf "\n\n" && \
+            printf "$RES" && \
+            printf "\n\n" && \
             exit 77
           fi
 

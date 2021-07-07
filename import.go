@@ -105,7 +105,23 @@ func fetchModule(root, importPath string) (string, error) {
 	pkg := pkgs[0]
 	if pkg.Module == nil {
 		if len(pkg.Errors) > 0 {
-			return "", fmt.Errorf("unable to find module for import %s : %s", importPath, pkg.Errors[0].Msg)
+			if pkg.Errors[0].Kind == packages.ListError && strings.Contains(pkg.Errors[0].Msg, "build constraints exclude all Go files") {
+				// If a package depends on an import that requires an explicit build tag,
+				// then, `packages.Load()` is going to fail. The only way to fix it would be to pass in
+				// the explicit build tag required by that dependency to `packages.Config.BuildFlags`
+				// However, we do not know in advance what the required build tags are. That's why the call
+				// to `packages.Load()/packages.Config` do not have any build tag specified.
+				//
+				// As an example, `/testdata/mod1/` depends on `golang.org/x/sys/windows`. That dependency
+				// has the build tag; `+build windows`: https://github.com/golang/sys/blob/0f9fa26af87c481a6877a4ca1330699ba9a30673/windows/aliases.go#L5-L8
+				// and thus `packages.Load()` fails with error;
+				// `build constraints exclude all Go files in /pkg/mod/golang.org/x/sys@v0.0.1/windows`
+				//
+				// We can always add more errors here as/when we discover them
+				return "", nil
+			} else {
+				return "", fmt.Errorf("unable to find module for import %s : %s", importPath, pkg.Errors[0].Msg)
+			}
 		} else {
 			// this can be raised if an import path is inside a file that has some build tag
 			// that ote didn't take into account.
@@ -126,21 +142,33 @@ func getAllTestModules(testImportPaths []string, nonTestImportPaths []string, ro
 	//
 	// Given that, it then only makes sense to filter out this import paths that are common
 	// before calling fetchModule(which is one of the most expensive calls in ote)
-	existsInBoth := []string{}
-	for _, a := range nonTestImportPaths {
-		if contains(testImportPaths, a) {
-			existsInBoth = append(existsInBoth, a)
-		}
-	}
-	testOnlyImportPaths := difference(testImportPaths, existsInBoth)
 
-	for _, v := range testOnlyImportPaths {
+	testOnlyMods := []string{}
+	for _, v := range testImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
 			return testModules, errF
 		}
-		testModules = append(testModules, m)
+		testOnlyMods = append(testOnlyMods, m)
 	}
+
+	nonTestMods := []string{}
+	for _, v := range nonTestImportPaths {
+		m, errF := fetchModule(root, v)
+		if errF != nil {
+			return testModules, errF
+		}
+		nonTestMods = append(nonTestMods, m)
+	}
+
+	existsInBoth := []string{}
+	for _, a := range nonTestMods {
+		if contains(testOnlyMods, a) {
+			existsInBoth = append(existsInBoth, a)
+		}
+	}
+
+	testModules = difference(testOnlyMods, existsInBoth)
 
 	return dedupe(testModules), nil
 }
@@ -194,11 +222,10 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	testModules, err := getAllTestModules(testImportPaths, nonTestImportPaths, root)
+	trueTestModules, err := getAllTestModules(testImportPaths, nonTestImportPaths, root)
 	if err != nil {
 		return []string{}, err
 	}
-	trueTestModules := testModules // difference(testModules, nonTestModules)
 
 	return trueTestModules, nil
 }

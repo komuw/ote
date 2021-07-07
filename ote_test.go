@@ -186,6 +186,25 @@ require (
 		},
 
 		{
+			name:     "testdata/mod7",
+			fp:       "testdata/mod7",
+			readonly: true,
+			wantErr:  "",
+			want: `module testdata/mod7
+
+go 1.16
+
+require (
+	github.com/DataDog/zstd v1.4.8
+	github.com/prometheus/client_golang v1.11.0
+)
+
+require rsc.io/qr v0.2.0 // test
+
+`,
+		},
+
+		{
 			name:     "testdata/nonExistentPackage",
 			fp:       "testdata/nonExistentPackage",
 			readonly: true,
