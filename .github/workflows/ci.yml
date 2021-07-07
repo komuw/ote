@@ -229,7 +229,7 @@ jobs:
 
           RES=$(./ote -r -f stuff_to_test/juju)
           num_juju_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
-          if [ "$num_juju_test_modules" != "9" ]; then
+          if [ "$num_juju_test_modules" != "0" ]; then
             printf "\n\t wrong number of test comments reported for juju/juju. reported: ${num_juju_test_modules}  \n" && \
             printf "\n\n" && \
             printf "$RES" && \
