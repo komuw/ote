@@ -136,6 +136,7 @@ jobs:
           go install golang.org/x/tools/cmd/goimports@latest
           go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          go install github.com/kisielk/errcheck@latest
 
           /home/runner/go/bin/staticcheck -version
         env:
@@ -151,6 +152,8 @@ jobs:
           /home/runner/go/bin/gosec .
           /home/runner/go/bin/structslop ./...
           /home/runner/go/bin/httperroryzer ./...
+          # see: https://github.com/golang/go/commit/a98589711da5e9d935e8d690cfca92892e86d557
+          /home/runner/go/bin/errcheck -ignoregenerated -ignoretests -asserts ./...
           # /home/runner/go/bin/golangci-lint run --no-config --enable=bodyclose,exhaustive,exportloopref,gochecknoglobals,tparallel,unparam,wrapcheck ./...
 
           mkdir -p /tmp/dgryski/semgrep-go
