@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"testdata/mod1/api"
 	"testdata/mod1/version"
 )

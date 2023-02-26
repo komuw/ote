@@ -20,7 +20,6 @@ func Test_getModFile(t *testing.T) {
 		gomodFile string
 		want      string
 	}{
-
 		{
 			name:      "mod1",
 			gomodFile: "testdata/mod1/go.mod",
@@ -56,13 +55,11 @@ func Test_updateMod(t *testing.T) {
 		f               *modfile.File
 	}{
 		{
-
 			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 			f:               fmod1,
 		},
 		{
-
 			name:            "mod4",
 			trueTestModules: []string{"github.com/benweissmann/memongo"},
 			f:               fmod4,
@@ -99,7 +96,6 @@ func Test_writeMod(t *testing.T) {
 		want            []string
 	}{
 		{
-
 			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 			f:               fmod1,
@@ -112,7 +108,6 @@ func Test_writeMod(t *testing.T) {
 			},
 		},
 		{
-
 			name:            "mod4",
 			trueTestModules: []string{"github.com/benweissmann/memongo"},
 			f:               fmod4,
