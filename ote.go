@@ -3,11 +3,12 @@
 // It maybe useful in places where it is important to audit all dependencies that are going to run in production.
 //
 // Install:
-//    go install github.com/komuw/ote@latest
+//
+//	go install github.com/komuw/ote@latest
 //
 // Usage:
-//    ote .
 //
+//	ote .
 package main
 
 import (
@@ -22,12 +23,13 @@ import (
 // TODO: better errors
 
 // Usage:
-//   1.
-//    go run . -f testdata/mod1/ -r
 //
-//   2.
-//    export export GOPACKAGESDEBUG=true && \
-//    go run . -f testdata/mod1/ -r
+//	1.
+//	 go run . -f testdata/mod1/ -r
+//
+//	2.
+//	 export export GOPACKAGESDEBUG=true && \
+//	 go run . -f testdata/mod1/ -r
 func main() {
 	f, r, v := cli()
 	if v {

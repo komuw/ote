@@ -22,7 +22,7 @@ var stdLibPkgs = map[string]struct{}{
 	"C": {}, // cGo. see: https://blog.golang.org/cgo
 }
 
-func isStdLibPkg(pkg string, std string) (bool, error) {
+func isStdLibPkg(pkg, std string) (bool, error) {
 	var err error
 	once.Do(func() {
 		pkgs, errL := packages.Load(nil, std)
@@ -76,9 +76,9 @@ func fetchImports(file string) ([]string, error) {
 	return impPaths, nil
 }
 
-//
 // Usage:
-//     fetchModule("testdata/mod1/", "github.com/hashicorp/nomad/drivers/shared/executor")
+//
+//	fetchModule("testdata/mod1/", "github.com/hashicorp/nomad/drivers/shared/executor")
 func fetchModule(root, importPath string) (string, error) {
 	cfg := &packages.Config{
 		Mode:  packages.NeedModule,
@@ -134,7 +134,7 @@ func fetchModule(root, importPath string) (string, error) {
 }
 
 // getAllTestModules finds all the Go modules used only in test files.
-func getAllTestModules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, err error) {
+func getAllTestModules(testImportPaths, nonTestImportPaths []string, root string) (testModules []string, err error) {
 	// There could be some import paths that exist in both test files & non-test files.
 	// In hashicorp/nomad we found that to be about 50% of imports.
 	// In juju/juju it is about 80%
@@ -232,7 +232,7 @@ func getTestModules(root string) ([]string, error) {
 
 // fetchToAnalyze returns only the list of Go files that need to be analyzed.
 // it excludes files that are in directories which are nested go modules.
-func fetchToAnalyze(allGoFiles []string, nonMainModFileDirs []string) []string {
+func fetchToAnalyze(allGoFiles, nonMainModFileDirs []string) []string {
 	notToBetAnalzyed := []string{}
 	for _, goFile := range allGoFiles {
 		for _, mod := range nonMainModFileDirs {

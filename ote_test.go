@@ -17,7 +17,6 @@ func Test_run(t *testing.T) {
 		wantErr  string
 		want     string
 	}{
-
 		{
 			name:     "testdata/mod1",
 			fp:       "testdata/mod1",

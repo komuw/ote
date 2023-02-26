@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"log/syslog"
+
 	myHook "testdata/mod5/hooks"
 
 	slhooks "github.com/sirupsen/logrus/hooks/syslog"

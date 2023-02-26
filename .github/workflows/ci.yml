@@ -5,14 +5,13 @@ on: [pull_request, push]
 
 jobs:
 
-
   check_release_notes:
     name: check_release_notes
     timeout-minutes: 1
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.20']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
@@ -64,14 +63,14 @@ jobs:
     timeout-minutes: 7
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.20']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.16
+          go-version: ['>=1.20']
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -106,14 +105,14 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.20']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.16
+          go-version: ['>=1.20']
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -147,7 +146,7 @@ jobs:
           diff <(gofmt -d .) <(printf "")
           go vet -all ./...
           go vet -vettool=/home/runner/go/bin/shadow -strict ./...
-          /home/runner/go/bin/staticcheck -tests -go 1.16 ./...
+          /home/runner/go/bin/staticcheck -tests -go 1.20 ./...
           /home/runner/go/bin/gosec .
           /home/runner/go/bin/structslop ./...
           /home/runner/go/bin/httperroryzer ./...
@@ -184,14 +183,14 @@ jobs:
     timeout-minutes: 8
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.20']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.16
+          go-version: ['>=1.20']
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
@@ -243,14 +242,14 @@ jobs:
   #   timeout-minutes: 2
   #   strategy:
   #     matrix:
-  #       go-version: [1.16]
-  #       platform: [ubuntu-18.04]
+  #       go-version: ['>=1.20']
+  #       platform: [ubuntu-22.04]
   #   runs-on: ${{ matrix.platform }}
   #   steps:
   #     - name: Set up Go
   #       uses: actions/setup-go@v1
   #       with:
-  #         go-version: 1.16
+  #         go-version: ['>=1.20']
 
   #     - name: Check out code into the Go module directory
   #       uses: actions/checkout@v1
