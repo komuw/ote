@@ -3,6 +3,9 @@
 Most recent version is listed first.  
 
 
+## v0.0.9
+- Update to Go v1.20
+
 ## v0.0.8
 - Bugfix, do not let build tags impact the source files that are scanned: https://github.com/komuw/ote/pull/41
 - Bugfix, check whether modules are in both test and non-test files
