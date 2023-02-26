@@ -4,7 +4,7 @@ Most recent version is listed first.
 
 
 ## v0.0.9
-- Update to Go v1.20
+- Update to Go v1.20: https://github.com/komuw/ote/pull/47
 
 ## v0.0.8
 - Bugfix, do not let build tags impact the source files that are scanned: https://github.com/komuw/ote/pull/41
