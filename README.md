@@ -52,6 +52,9 @@ require (
 	github.com/nats-io/nats.go v1.10.0
 	github.com/stretchr/testify v1.6.1 // priorComment
 	golang.org/x/mod v0.3.0
+)
+
+require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.7 // indirect
 )
@@ -66,6 +69,9 @@ require (
 	github.com/Shopify/sarama v1.26.4
 	github.com/nats-io/nats.go v1.10.0
 	golang.org/x/mod v0.3.0
+)
+
+require (
 	github.com/golang/protobuf v1.4.2 // indirect
 	github.com/nats-io/nats-server/v2 v2.1.7 // indirect
 )
