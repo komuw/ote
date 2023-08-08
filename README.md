@@ -15,7 +15,7 @@ There are various reasons why this is so, see [go/issues/26955](https://github.c
 Thus `ote` fills that missing gap.   
 It is not perfect, but it seems to work. See [How it works](#how-it-works)        
 
-For an example of a project using `ote`, see: [ong/go.mod](https://github.com/komuw/ong/blob/v0.0.40/go.mod)                
+For an example of a project using `ote`, see: [ong/go.mod](https://github.com/komuw/ong/blob/v0.0.73/go.mod)                
 
 
 ## Installation
