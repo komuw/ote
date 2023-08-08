@@ -203,8 +203,7 @@ jobs:
 
           # TODO: add https://github.com/system-pclub/GCatch
 
-
-do_acceptance:
+  do_acceptance:
     name: do_acceptance
     timeout-minutes: 8
     strategy:
@@ -213,23 +212,23 @@ do_acceptance:
         platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v3
+
       - name: Set up Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
       - name: Checkout hashicorp/nomad
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: hashicorp/nomad
           ref: v1.1.0-beta1
           path: stuff_to_test/nomad
 
       - name: Checkout juju/juju
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: juju/juju
           ref: juju-2.9.0
