@@ -203,8 +203,7 @@ jobs:
 
           # TODO: add https://github.com/system-pclub/GCatch
 
-
-do_acceptance:
+  do_acceptance:
     name: do_acceptance
     timeout-minutes: 8
     strategy:
