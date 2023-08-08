@@ -75,7 +75,7 @@ func cli() (string, bool, bool) {
 	var r bool
 
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(),
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(),
 			`ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
 
 Usage:
