@@ -44,7 +44,7 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 				if err := f.DropRequire(fr.Mod.Path); err != nil {
 					return err
 				}
-			} else if !slices.Contains(trueTestModules, fr.Mod.Path) {
+			} else if !slices.Contains(trueTestModules, fr.Mod.Path) && !isTest(fr.Syntax) {
 				// This is a direct dependency that is also not a test dependency.
 				directLines = append(directLines, &modfile.Line{
 					Token:    []string{fr.Mod.Path, fr.Mod.Version},
