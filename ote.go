@@ -61,12 +61,9 @@ func run(fp string, w io.Writer, readonly bool) error {
 	if errU != nil {
 		return errU
 	}
-	f.SortBlocks()
-	f.Cleanup()
 
-	errW := writeMod(f, gomodFile, w, readonly)
-	if errW != nil {
-		return errW
+	if err := writeMod(f, gomodFile, w, readonly); err != nil {
+		return err
 	}
 
 	return nil
