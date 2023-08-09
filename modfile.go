@@ -190,30 +190,28 @@ func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) err
 	}
 
 	if readonly {
-		fmt.Fprintln(w, string(b))
+		_, _ = fmt.Fprintln(w, string(b))
 	} else {
-		i, errS := os.Stat(gomodFile)
+		fInfo, errS := os.Stat(gomodFile)
 		if errS != nil {
 			return errS
 		}
 
-		fi, errO := os.OpenFile(gomodFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, i.Mode())
+		fi, errO := os.OpenFile(gomodFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, fInfo.Mode())
 		if errO != nil {
 			return errO
 		}
+		defer func() {
+			_ = fi.Close()
+		}()
 
 		_, errW := fi.Write(b)
 		if errW != nil {
 			return errW
 		}
 
-		errC := fi.Close()
-		if errC != nil {
-			return errC
-		}
-
-		fmt.Fprintln(w, "successfully updated go.mod file.")
-		return errC
+		_, _ = fmt.Fprintln(w, "successfully updated go.mod file.")
+		return nil
 	}
 
 	return nil
