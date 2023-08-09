@@ -159,7 +159,6 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) error {
 	}
 	index := findLastRequire(f) + 1
 	f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, newTestBlock)
-	f.Syntax.Cleanup()
 
 	return nil
 }
