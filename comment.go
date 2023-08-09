@@ -48,17 +48,20 @@ import (
 //
 //
 
-var (
-	slashSlash  = []byte("//")
+const (
+	slashSlash  = "//"
 	testComment = "// test"
 )
 
 // isTest reports whether line has a "// test" comment
 func isTest(line *modfile.Line) bool {
+	if line == nil {
+		return false
+	}
 	if len(line.Suffix) == 0 {
 		return false
 	}
-	f := strings.Fields(strings.TrimPrefix(line.Suffix[0].Token, string(slashSlash)))
+	f := strings.Fields(strings.TrimPrefix(line.Suffix[0].Token, slashSlash))
 	return (len(f) == 1 && f[0] == "test" || len(f) > 1 && f[0] == "test;")
 }
 
@@ -77,7 +80,7 @@ func setTest(line *modfile.Line, add bool) {
 		}
 
 		com := &line.Suffix[0]
-		text := strings.TrimSpace(strings.TrimPrefix(com.Token, string(slashSlash)))
+		text := strings.TrimSpace(strings.TrimPrefix(com.Token, slashSlash))
 		if text == "" {
 			// Empty comment.
 			com.Token = testComment
@@ -88,7 +91,7 @@ func setTest(line *modfile.Line, add bool) {
 		com.Token = "// test; " + text
 	} else {
 		// Removing comment.
-		f := strings.TrimSpace(strings.TrimPrefix(line.Suffix[0].Token, string(slashSlash)))
+		f := strings.TrimSpace(strings.TrimPrefix(line.Suffix[0].Token, slashSlash))
 		if f == "test" {
 			// Remove whole comment.
 			line.Suffix = nil

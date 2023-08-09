@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"testing"
 
 	qt "github.com/frankban/quicktest"
@@ -24,19 +25,19 @@ func Test_difference(t *testing.T) {
 		{
 			name:            "some slices",
 			testModules:     []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil", "rsc.io/quote"},
-			nonTestModules:  []string{"github.com/hashicorp/nomad", "github.com/pkg/errors", "rsc.io/quote", "testdata/mod1", "github.com/LK4D4/joincontext"},
+			nonTestModules:  []string{"github.com/hashicorp/nomad", "github.com/pkg/errors", "rsc.io/quote", "testdata/modfiles/mod1", "github.com/LK4D4/joincontext"},
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 		{
 			name:            "duplicate items I",
 			testModules:     []string{"github.com/frankban/quicktest", "rsc.io/quote", "github.com/shirou/gopsutil", "rsc.io/quote"},
-			nonTestModules:  []string{"github.com/hashicorp/nomad", "github.com/pkg/errors", "rsc.io/quote", "testdata/mod1", "github.com/LK4D4/joincontext"},
+			nonTestModules:  []string{"github.com/hashicorp/nomad", "github.com/pkg/errors", "rsc.io/quote", "testdata/modfiles/mod1", "github.com/LK4D4/joincontext"},
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 		{
 			name:            "duplicate items II",
 			testModules:     []string{"github.com/frankban/quicktest", "rsc.io/quote", "github.com/shirou/gopsutil", "rsc.io/quote"},
-			nonTestModules:  []string{"rsc.io/quote", "github.com/hashicorp/nomad", "github.com/pkg/errors", "rsc.io/quote", "testdata/mod1", "github.com/LK4D4/joincontext"},
+			nonTestModules:  []string{"rsc.io/quote", "github.com/hashicorp/nomad", "github.com/pkg/errors", "rsc.io/quote", "testdata/modfiles/mod1", "github.com/LK4D4/joincontext"},
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 	}
@@ -133,7 +134,7 @@ func Test_contains(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
-			got := contains(tt.a, tt.x)
+			got := slices.Contains(tt.a, tt.x)
 			c.Assert(got, qt.Equals, tt.want)
 		})
 	}

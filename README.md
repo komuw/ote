@@ -10,11 +10,12 @@
 
 It's name is derived from Kenyan hip hop artiste, `Oteraw`(One third of the hiphop group `Kalamashaka`).                               
 
-By default, `go` and its related tools(`go mod` etc) do not differentiate regular dependencies from test ones, when updating/writing the `go.mod` file.    
+By default, `go` and its related tools(`go mod` etc) do not differentiate regular dependencies from test ones when updating/writing the `go.mod` file.    
 There are various reasons why this is so, see [go/issues/26955](https://github.com/golang/go/issues/26955) & [go/issues/26913](https://github.com/golang/go/issues/26913)      
 Thus `ote` fills that missing gap.   
-It is not perfect, but it seems to work. See [How it works](#how-it-works)
+It is not perfect, but it seems to work. See [How it works](#how-it-works)        
 
+For an example of a project using `ote`, see: [ong/go.mod](https://github.com/komuw/ong/blob/v0.0.73/go.mod)                
 
 
 ## Installation

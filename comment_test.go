@@ -15,7 +15,6 @@ func TestIsTest(t *testing.T) {
 		line     *modfile.Line
 		expected bool
 	}{
-
 		{
 			line: &modfile.Line{
 				Comments: modfile.Comments{
@@ -70,7 +69,6 @@ func TestSetTest(t *testing.T) {
 		expected string
 		add      bool
 	}{
-
 		{
 			line: &modfile.Line{
 				Comments: modfile.Comments{

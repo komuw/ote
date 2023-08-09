@@ -20,11 +20,10 @@ func Test_getModFile(t *testing.T) {
 		gomodFile string
 		want      string
 	}{
-
 		{
 			name:      "mod1",
-			gomodFile: "testdata/mod1/go.mod",
-			want:      "testdata/mod1",
+			gomodFile: "testdata/modfiles/mod1/go.mod",
+			want:      "testdata/modfiles/mod1",
 		},
 	}
 	for _, tt := range tests {
@@ -41,11 +40,11 @@ func Test_getModFile(t *testing.T) {
 }
 
 func Test_updateMod(t *testing.T) {
-	fmod1, _ := getModFile("testdata/mod1/go.mod")
+	fmod1, _ := getModFile("testdata/modfiles/mod1/go.mod")
 	t.Cleanup(func() {
 		fmod1.Cleanup()
 	})
-	fmod4, _ := getModFile("testdata/mod4/go.mod")
+	fmod4, _ := getModFile("testdata/modfiles/mod4/go.mod")
 	t.Cleanup(func() {
 		fmod4.Cleanup()
 	})
@@ -56,13 +55,11 @@ func Test_updateMod(t *testing.T) {
 		f               *modfile.File
 	}{
 		{
-
 			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 			f:               fmod1,
 		},
 		{
-
 			name:            "mod4",
 			trueTestModules: []string{"github.com/benweissmann/memongo"},
 			f:               fmod4,
@@ -81,11 +78,11 @@ func Test_updateMod(t *testing.T) {
 }
 
 func Test_writeMod(t *testing.T) {
-	fmod1, _ := getModFile("testdata/mod1/go.mod")
+	fmod1, _ := getModFile("testdata/modfiles/mod1/go.mod")
 	t.Cleanup(func() {
 		fmod1.Cleanup()
 	})
-	fmod4, _ := getModFile("testdata/mod4/go.mod")
+	fmod4, _ := getModFile("testdata/modfiles/mod4/go.mod")
 	t.Cleanup(func() {
 		fmod4.Cleanup()
 	})
@@ -99,27 +96,25 @@ func Test_writeMod(t *testing.T) {
 		want            []string
 	}{
 		{
-
 			name:            "mod1",
 			trueTestModules: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 			f:               fmod1,
-			gomodFile:       "testdata/mod1/go.mod",
+			gomodFile:       "testdata/modfiles/mod1/go.mod",
 			readonly:        true,
 			want: []string{
-				"module testdata/mod1",
+				"module testdata/modfiles/mod1",
 				"github.com/frankban/quicktest v1.12.1 // test",
 				"github.com/shirou/gopsutil v2.20.9+incompatible // test",
 			},
 		},
 		{
-
 			name:            "mod4",
 			trueTestModules: []string{"github.com/benweissmann/memongo"},
 			f:               fmod4,
-			gomodFile:       "testdata/mod4/go.mod",
+			gomodFile:       "testdata/modfiles/mod4/go.mod",
 			readonly:        true,
 			want: []string{
-				"module testdata/mod4",
+				"module testdata/modfiles/mod4",
 				"github.com/alexedwards/scs/v2 v2.4.0",
 				"github.com/aws/aws-sdk-go v1.38.31",
 				"github.com/benweissmann/memongo v0.1.1 // test",

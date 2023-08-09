@@ -1,0 +1,25 @@
+linters:
+  enable:
+    - bodyclose
+    - exhaustive
+    - exportloopref
+    - gochecknoglobals
+    - tparallel
+    - unparam
+    - gocritic
+
+    # /home/runner/go/bin/golangci-lint run --no-config --enable=bodyclose,exhaustive,exportloopref,gochecknoglobals,tparallel,unparam ./...
+    # golangci-lint run --config .golangci.yml ./...
+
+# /home/runner/go/bin/errcheck -ignoregenerated -ignoretests -asserts ./...
+
+linters-settings:
+  gocritic:
+    # See https://go-critic.github.io/overview#checks-overview
+    # To check which checks are enabled run `GL_DEBUG=gocritic golangci-lint run`
+    enabled-checks:
+      - ruleguard
+    settings:
+      ruleguard:
+        # The special '${configDir}' variable is substituted with the absolute directory containing the golangci config file.
+        rules: '/tmp/semgrep-go/semgrep-go-master/ruleguard.rules.go'

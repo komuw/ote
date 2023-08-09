@@ -7,32 +7,24 @@ import (
 	"go/token"
 	"io/fs"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 
-	"golang.org/x/mod/modfile"
-	"golang.org/x/mod/module"
 	"golang.org/x/tools/go/packages"
-)
-
-// This lists are got from https://github.com/golang/go/blob/master/src/go/build/syslist.go
-// They should be synced periodically
-const (
-	goosList   = "aix android darwin dragonfly freebsd hurd illumos ios js linux nacl netbsd openbsd plan9 solaris windows zos "
-	goarchList = "386 amd64 amd64p32 arm armbe arm64 arm64be ppc64 ppc64le mips mipsle mips64 mips64le mips64p32 mips64p32le ppc riscv riscv64 s390 s390x sparc sparc64 wasm "
-	cGo        = "cgo"
 )
 
 const stdlib = "std"
 
 // once is used to ensure that the stdLibPkgs map is populated only once
-var once = &sync.Once{}
+var (
+	once       = &sync.Once{}         //nolint:gochecknoglobals
+	stdLibPkgs = map[string]struct{}{ //nolint:gochecknoglobals
+		"C": {}, // cGo. see: https://blog.golang.org/cgo
+	}
+)
 
-var stdLibPkgs = map[string]struct{}{
-	"C": {}, // cGo. see: https://blog.golang.org/cgo
-}
-
-func isStdLibPkg(pkg string, std string) (bool, error) {
+func isStdLibPkg(pkg, std string) (bool, error) {
 	var err error
 	once.Do(func() {
 		pkgs, errL := packages.Load(nil, std)
@@ -86,18 +78,14 @@ func fetchImports(file string) ([]string, error) {
 	return impPaths, nil
 }
 
-//
 // Usage:
-//     fetchModule("testdata/mod1/", "github.com/hashicorp/nomad/drivers/shared/executor")
+//
+//	fetchModule("testdata/modfiles/mod1/", "github.com/hashicorp/nomad/drivers/shared/executor")
 func fetchModule(root, importPath string) (string, error) {
-	buildFlags := (strings.Join(strings.Split(goosList, " "), ",") +
-		strings.Join(strings.Split(goarchList, " "), ",") +
-		cGo)
 	cfg := &packages.Config{
-		Mode:       packages.NeedModule,
-		Tests:      false,
-		BuildFlags: []string{fmt.Sprintf("-tags=%s", buildFlags)},
-		Dir:        root,
+		Mode:  packages.NeedModule,
+		Tests: false,
+		Dir:   root,
 	}
 	pkgs, err := packages.Load(
 		cfg,
@@ -119,7 +107,23 @@ func fetchModule(root, importPath string) (string, error) {
 	pkg := pkgs[0]
 	if pkg.Module == nil {
 		if len(pkg.Errors) > 0 {
-			return "", fmt.Errorf("unable to find module for import %s : %s", importPath, pkg.Errors[0].Msg)
+			if pkg.Errors[0].Kind == packages.ListError && strings.Contains(pkg.Errors[0].Msg, "build constraints exclude all Go files") {
+				// If a package depends on an import that requires an explicit build tag,
+				// then, `packages.Load()` is going to fail. The only way to fix it would be to pass in
+				// the explicit build tag required by that dependency to `packages.Config.BuildFlags`
+				// However, we do not know in advance what the required build tags are. That's why the call
+				// to `packages.Load()/packages.Config` do not have any build tag specified.
+				//
+				// As an example, `/testdata/modfiles/mod1/` depends on `golang.org/x/sys/windows`. That dependency
+				// has the build tag; `+build windows`: https://github.com/golang/sys/blob/0f9fa26af87c481a6877a4ca1330699ba9a30673/windows/aliases.go#L5-L8
+				// and thus `packages.Load()` fails with error;
+				// `build constraints exclude all Go files in /pkg/mod/golang.org/x/sys@v0.0.1/windows`
+				//
+				// We can always add more errors here as/when we discover them
+				return "", nil
+			} else {
+				return "", fmt.Errorf("unable to find module for import %s : %s", importPath, pkg.Errors[0].Msg)
+			}
 		} else {
 			// this can be raised if an import path is inside a file that has some build tag
 			// that ote didn't take into account.
@@ -128,18 +132,11 @@ func fetchModule(root, importPath string) (string, error) {
 		}
 	}
 
-	mRequire := modfile.Require{
-		Mod:      module.Version{Path: pkg.Module.Path, Version: pkg.Module.Version},
-		Indirect: pkg.Module.Indirect,
-	}
-	// TODO: remove this
-	_ = mRequire
-
 	return pkg.Module.Path, nil
 }
 
 // getAllTestModules finds all the Go modules used only in test files.
-func getAllTestModules(testImportPaths []string, nonTestImportPaths []string, root string) (testModules []string, err error) {
+func getAllTestModules(testImportPaths, nonTestImportPaths []string, root string) (testModules []string, err error) {
 	// There could be some import paths that exist in both test files & non-test files.
 	// In hashicorp/nomad we found that to be about 50% of imports.
 	// In juju/juju it is about 80%
@@ -147,21 +144,33 @@ func getAllTestModules(testImportPaths []string, nonTestImportPaths []string, ro
 	//
 	// Given that, it then only makes sense to filter out this import paths that are common
 	// before calling fetchModule(which is one of the most expensive calls in ote)
-	existsInBoth := []string{}
-	for _, a := range nonTestImportPaths {
-		if contains(testImportPaths, a) {
-			existsInBoth = append(existsInBoth, a)
-		}
-	}
-	testOnlyImportPaths := difference(testImportPaths, existsInBoth)
 
-	for _, v := range testOnlyImportPaths {
+	testOnlyMods := []string{}
+	for _, v := range testImportPaths {
 		m, errF := fetchModule(root, v)
 		if errF != nil {
 			return testModules, errF
 		}
-		testModules = append(testModules, m)
+		testOnlyMods = append(testOnlyMods, m)
 	}
+
+	nonTestMods := []string{}
+	for _, v := range nonTestImportPaths {
+		m, errF := fetchModule(root, v)
+		if errF != nil {
+			return testModules, errF
+		}
+		nonTestMods = append(nonTestMods, m)
+	}
+
+	existsInBoth := []string{}
+	for _, a := range nonTestMods {
+		if slices.Contains(testOnlyMods, a) {
+			existsInBoth = append(existsInBoth, a)
+		}
+	}
+
+	testModules = difference(testOnlyMods, existsInBoth)
 
 	return dedupe(testModules), nil
 }
@@ -215,18 +224,17 @@ func getTestModules(root string) ([]string, error) {
 		return []string{}, err
 	}
 
-	testModules, err := getAllTestModules(testImportPaths, nonTestImportPaths, root)
+	trueTestModules, err := getAllTestModules(testImportPaths, nonTestImportPaths, root)
 	if err != nil {
 		return []string{}, err
 	}
-	trueTestModules := testModules // difference(testModules, nonTestModules)
 
 	return trueTestModules, nil
 }
 
 // fetchToAnalyze returns only the list of Go files that need to be analyzed.
 // it excludes files that are in directories which are nested go modules.
-func fetchToAnalyze(allGoFiles []string, nonMainModFileDirs []string) []string {
+func fetchToAnalyze(allGoFiles, nonMainModFileDirs []string) []string {
 	notToBetAnalzyed := []string{}
 	for _, goFile := range allGoFiles {
 		for _, mod := range nonMainModFileDirs {

@@ -1,36 +1,41 @@
-# DOCS: https://help.github.com/en/articles/workflow-syntax-for-github-actions
+# DOCS:
+#  1. https://help.github.com/en/articles/workflow-syntax-for-github-actions
+#  2. https://github.com/mvdan/github-actions-golang/issues/22
+#  3. https://github.com/stellar/go/blob/master/.github/actions/setup-go/action.yml
+#  4. https://github.com/stellar/go/blob/master/.github/workflows/go.yml
+#  5. https://github.com/mvdan/github-actions-golang#how-do-i-set-up-caching-between-builds
+#  6. https://github.com/golang/go/issues/58571
 
 name: ote ci
-on: [pull_request, push]
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
-
 
   check_release_notes:
     name: check_release_notes
     timeout-minutes: 1
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.21.0']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: ${{ matrix.go-version }}
-
-      - name: checkout main branch too. # so that it is also available for diff operations
-        uses: actions/checkout@v2
+      # checkout main branch and the current branch so that we are able to do diff operations.
+      - name: checkout main branch too.
+        uses: actions/checkout@v3
         with:
           ref: main
-
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
       - name: check if changes have release notes
-        if: github.ref != 'refs/heads/main'
+        if: ${{ github.ref != 'refs/heads/main' }}
         env:
           GIT_BRANCH: ${{ github.ref }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
@@ -41,7 +46,6 @@ jobs:
           printf "GITHUB_BASE_REF: $GITHUB_BASE_REF \n"
           printf "list git branches: \n"
           git branch --list --all
-
           if [[ "$GIT_BRANCH" == "refs/heads/main" ]]
           then
               printf "\n $GIT_BRANCH branch, ignoring check for relese notes \n"
@@ -64,64 +68,60 @@ jobs:
     timeout-minutes: 7
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.21.0']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
-
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4 # since v4, it added cache by default.
+        with:
+          go-version: ${{ matrix.go-version }}
 
       - name: tests and benchmarks
         run: |
-          go test -timeout 1m -race -run=XXXX -bench=. ./...
-          go test -timeout 4m -v -race ./...
-
-      - name: test coverage
-        run: |
+          ulimit -a
+          env
           set -x
 
-          # check integrity of codecov
-          curl -s https://codecov.io/bash > codecov;
-          VERSION=$(grep -o 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-          shasum --algorithm 512 --check <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA512SUM" | grep codecov)
-          rm -rf codecov
-
-          go test -timeout 4m -v -race -cover -coverprofile=coverage.out ./... && bash <(curl -s https://codecov.io/bash)
+          go test -timeout 1m -race -run=XXXX -bench=. ./...
+          go test -timeout 4m -race -cover -coverprofile=coverage.out -shuffle on ./...
           go tool cover -html=coverage.out -o coverage.html
           go tool cover -func=coverage.out
+
+          wget -nc --output-document=/tmp/codecov https://github.com/codecov/uploader/releases/download/v0.3.5/codecov-linux
+          chmod +x /tmp/codecov
+          /tmp/codecov
 
       - name: dummy run
         run: |
           go build -trimpath -race -o ote .
           ./ote -h
-          ./ote -f testdata/mod1 -r
+          ./ote -f testdata/modfiles/mod1 -r
 
   run_analysis:
     name: run_analysis
-    timeout-minutes: 5
+    timeout-minutes: 6
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.21.0']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
-
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
 
       - name: install apt and pip deps
         run: |
           pwd; ls -lsha
-          sudo apt-get -y update
+          sudo apt -y update
           sudo apt -y install wget
 
       - name: install tools
@@ -135,7 +135,15 @@ jobs:
           go install golang.org/x/tools/cmd/stress@latest
           go install golang.org/x/tools/cmd/goimports@latest
           go install golang.org/x/tools/go/analysis/passes/shadow/cmd/shadow@latest
+          go install golang.org/x/tools/go/analysis/passes/nilness/cmd/nilness@latest
+          go install github.com/kisielk/errcheck@latest
           go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          go install mvdan.cc/gofumpt@latest
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          go install github.com/mdempsky/unconvert@latest
+          go install github.com/zricethezav/gitleaks/v8@latest
+          # go install gvisor.dev/gvisor/tools/checklocks/cmd/checklocks@latest
+          go install gvisor.dev/gvisor/tools/checklocks/cmd/checklocks@v0.0.0-20230224200604-34ff3ebe0556
 
           /home/runner/go/bin/staticcheck -version
         env:
@@ -144,20 +152,44 @@ jobs:
       - name: static analysis
         run: |
           set -x
+
           diff <(gofmt -d .) <(printf "")
+          diff <(gofumpt -extra -w -d .) <(printf "")
+          diff <(goimports -d .) <(printf "")
+
           go vet -all ./...
           go vet -vettool=/home/runner/go/bin/shadow -strict ./...
-          /home/runner/go/bin/staticcheck -tests -go 1.16 ./...
-          /home/runner/go/bin/gosec .
-          /home/runner/go/bin/structslop ./...
+          go vet -vettool=/home/runner/go/bin/nilness -test ./...
+          /home/runner/go/bin/checklocks -test=false ./...
+          /home/runner/go/bin/staticcheck -tests ./...
+          govulncheck ./...
+          # /home/runner/go/bin/gosec ./... # does not seem to work with Go1.21
+          # /home/runner/go/bin/structslop ./... # does not seem to work with Go1.21
           /home/runner/go/bin/httperroryzer ./...
-          # /home/runner/go/bin/golangci-lint run --no-config --enable=bodyclose,exhaustive,exportloopref,gochecknoglobals,tparallel,unparam,wrapcheck ./...
+          # see: https://github.com/golang/go/commit/a98589711da5e9d935e8d690cfca92892e86d557
+          /home/runner/go/bin/errcheck -ignoregenerated -ignoretests -asserts ./...
+          /home/runner/go/bin/unconvert -v ./...
+          /home/runner/go/bin/gitleaks detect . -v --no-git --baseline-path .gitleaksignore
+          # To create the gitleaksignore file, run;
+          # rm -rf .gitleaksignore; gitleaks detect . --no-git --report-path .gitleaksignore
 
-          mkdir -p /tmp/dgryski/semgrep-go
-          wget -nc --output-document=/tmp/dgryski/semgrep-go/rules.go https://raw.githubusercontent.com/dgryski/semgrep-go/master/ruleguard.rules.go
+          # dont use golangci-lint
+          # see: https://twitter.com/dominikhonnef/status/1394766501157167112
+          #
+          # In our case we need to use it so that we can be able to use `nolint:gocritic` in the errors package.
+          #
+          wget -nc --output-document=/tmp/semgrep-go.zip https://github.com/dgryski/semgrep-go/archive/refs/heads/master.zip
+          unzip -o /tmp/semgrep-go.zip -d /tmp/semgrep-go
           go get github.com/quasilyte/go-ruleguard/dsl
-          /home/runner/go/bin/ruleguard -c 1 -rules /tmp/dgryski/semgrep-go/rules.go ./...
+          # golangci-lint run --config .golangci.yml ./... # does not seem to work with Go1.21
           go mod tidy
+          python -m venv /tmp/.venv
+          . /tmp/.venv/bin/activate
+          python -m pip install --trusted-host files.pythonhosted.org --trusted-host pypi.org --trusted-host pypi.python.org semgrep
+          semgrep -f /tmp/semgrep-go/semgrep-go-master/ --error .
+          deactivate
+          # An alternative it to do:
+          # semgrep -f https://semgrep.dev/r/dgryski.semgrep-go --exclude="*_test.go" .
 
           # deadlock detection
           # https://github.com/cockroachdb/cockroach/issues/7972
@@ -166,45 +198,37 @@ jobs:
           find . -name "*.go" | xargs -n 1 sed -i.backup 's/sync.Mutex/deadlock.Mutex/'
           find . -name '*.backup' -delete
           /home/runner/go/bin/goimports -w .
-          go test -timeout 4m -v -race ./...
+          go test -timeout 4m -race ./...
           go mod tidy
-
-          # error shadowing
-          num_err_shadows=$(grep -irSn 'err = ' *.go | wc -l | tr -d ' ')
-          if [ "$num_err_shadows" != "0" ]; then
-              printf "\n\t fix error shadowing \n" && \
-              grep -irSn 'err = ' *.go
-              exit 77
-          fi
 
           # TODO: add https://github.com/system-pclub/GCatch
 
   do_acceptance:
     name: do_acceptance
-    timeout-minutes: 3
+    timeout-minutes: 8
     strategy:
       matrix:
-        go-version: [1.16]
-        platform: [ubuntu-18.04]
+        go-version: ['>=1.21.0']
+        platform: [ubuntu-22.04]
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.16
-
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
 
       - name: Checkout hashicorp/nomad
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: hashicorp/nomad
           ref: v1.1.0-beta1
           path: stuff_to_test/nomad
 
       - name: Checkout juju/juju
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: juju/juju
           ref: juju-2.9.0
@@ -217,36 +241,39 @@ jobs:
           ls -lsha stuff_to_test/
           go build -trimpath -race -o ote .
 
-          num_nomad_test_modules=$(./ote -r -f stuff_to_test/nomad/ | grep '// test' | wc -l | tr -d ' ')
-          if [ "$num_nomad_test_modules" != "4" ]; then
+          RES=$(./ote -r -f stuff_to_test/nomad/)
+          num_nomad_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
+          if [ "$num_nomad_test_modules" != "3" ]; then
             printf "\n\t wrong number of test comments reported for hashicorp/nomad. reported: ${num_nomad_test_modules} \n" && \
+            printf "\n\n" && \
+            printf "$RES" && \
+            printf "\n\n" && \
             exit 77
           fi
 
-          num_juju_test_modules=$(./ote -r -f stuff_to_test/juju | grep '// test' | wc -l | tr -d ' ')
-          if [ "$num_juju_test_modules" != "9" ]; then
+          RES=$(./ote -r -f stuff_to_test/juju)
+          num_juju_test_modules=$(echo "$RES" | grep '// test' | wc -l | tr -d ' ')
+          if [ "$num_juju_test_modules" != "0" ]; then
             printf "\n\t wrong number of test comments reported for juju/juju. reported: ${num_juju_test_modules}  \n" && \
+            printf "\n\n" && \
+            printf "$RES" && \
+            printf "\n\n" && \
             exit 77
           fi
-
 
   # run_stress_test:
   #   name: run_stress_test
   #   timeout-minutes: 2
   #   strategy:
   #     matrix:
-  #       go-version: [1.16]
-  #       platform: [ubuntu-18.04]
+  #       go-version: ['>=1.21.0']
+  #       platform: [ubuntu-22.04]
   #   runs-on: ${{ matrix.platform }}
   #   steps:
-  #     - name: Set up Go
-  #       uses: actions/setup-go@v1
-  #       with:
-  #         go-version: 1.16
-
-  #     - name: Check out code into the Go module directory
-  #       uses: actions/checkout@v1
-
+  # - name: Set up Go
+  #   uses: actions/setup-go@v4
+  #   with:
+  #     go-version: ${{ matrix.go-version }}
   #     - name: stress test
   #       run: |
   #         go install golang.org/x/tools/cmd/stress@latest

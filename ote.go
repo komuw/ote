@@ -3,11 +3,12 @@
 // It maybe useful in places where it is important to audit all dependencies that are going to run in production.
 //
 // Install:
-//    go install github.com/komuw/ote@latest
+//
+//	go install github.com/komuw/ote@latest
 //
 // Usage:
-//    ote .
 //
+//	ote .
 package main
 
 import (
@@ -22,12 +23,13 @@ import (
 // TODO: better errors
 
 // Usage:
-//   1.
-//    go run . -f testdata/mod1/ -r
 //
-//   2.
-//    export export GOPACKAGESDEBUG=true && \
-//    go run . -f testdata/mod1/ -r
+//	1.
+//	 go run . -f testdata/modfiles/mod1/ -r
+//
+//	2.
+//	 export export GOPACKAGESDEBUG=true && \
+//	 go run . -f testdata/modfiles/mod1/ -r
 func main() {
 	f, r, v := cli()
 	if v {
@@ -40,6 +42,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	os.Exit(0)
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
@@ -54,14 +57,13 @@ func run(fp string, w io.Writer, readonly bool) error {
 	if errT != nil {
 		return errT
 	}
-	errU := updateMod(trueTestModules, f)
-	if errU != nil {
-		return errU
+
+	if err := updateMod(trueTestModules, f); err != nil {
+		return err
 	}
 
-	errW := writeMod(f, gomodFile, w, readonly)
-	if errW != nil {
-		return errW
+	if err := writeMod(f, gomodFile, w, readonly); err != nil {
+		return err
 	}
 
 	return nil
@@ -73,7 +75,7 @@ func cli() (string, bool, bool) {
 	var r bool
 
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(),
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(),
 			`ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
 
 Usage:
