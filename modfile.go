@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 
 	"golang.org/x/mod/modfile"
-	"golang.org/x/mod/module"
 )
 
 type lineMod struct {
@@ -33,51 +32,25 @@ func getModFile(gomodFile string) (*modfile.File, error) {
 // updateMod updates the in-memory modfile
 func updateMod(trueTestModules []string, f *modfile.File) error {
 	{ // 1. update for indirect modules.
-		type KomuReq struct {
-			Mod      module.Version
-			Indirect bool // has "// indirect" comment
-			Syntax   modfile.Line
-		}
-
-		indirectRequires := []KomuReq{}
+		indirectLines := []*modfile.Line{}
 		for _, fr := range f.Require {
 			if fr.Indirect {
 				// fmt.Println("\n\t fr: ", fr.Syntax)
-				xx := KomuReq{Mod: fr.Mod, Indirect: fr.Indirect, Syntax: *fr.Syntax}
-				fmt.Println("xx: ", xx)
-				indirectRequires = append(indirectRequires, xx)
+				indirectLines = append(indirectLines, &modfile.Line{
+					Token:    []string{fr.Mod.Path, fr.Mod.Version},
+					Comments: fr.Syntax.Comments,
+				})
 				f.DropRequire(fr.Mod.Path)
 			}
 		}
 
-		testLines := []*modfile.Line{}
-		if len(indirectRequires) > 0 {
-			// f.Syntax.Cleanup()
-
-			for _, l := range indirectRequires {
-				// TODO: check if this preserves existing comments.
-				//       or if we should use `f.AddRequire()` instead.
-
-				// f.AddNewRequire(l.Mod.Path, l.Mod.Version, true)
-				// fmt.Println("\n\t l: ", l, l.Syntax)
-				// f.AddRequire(l.Mod.Path, l.Mod.Version)
-
-				testLines = append(testLines, &modfile.Line{
-					Token:    []string{l.Mod.Path, l.Mod.Version},
-					Comments: l.Syntax.Comments,
-				})
+		if len(indirectLines) > 0 {
+			tBlock := &modfile.LineBlock{
+				Token: []string{"require"},
+				Line:  indirectLines,
 			}
-
-			{
-				tBlock := &modfile.LineBlock{
-					Token: []string{"require"},
-					Line:  testLines,
-				}
-				index := findLastRequire(f) + 1
-				f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, tBlock)
-
-			}
-			// f.Syntax.Cleanup()
+			index := findLastRequire(f) + 1
+			f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, tBlock)
 		}
 	}
 
