@@ -99,7 +99,7 @@ jobs:
         run: |
           go build -trimpath -race -o ote .
           ./ote -h
-          ./ote -f testdata/mod1 -r
+          ./ote -f testdata/modfiles/mod1 -r
 
   run_analysis:
     name: run_analysis
