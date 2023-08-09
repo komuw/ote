@@ -3,6 +3,9 @@
 Most recent version is listed first.  
 
 
+## v0.0.11
+- Bugfix;direct dependencies in a require block with indirect deps should be well formatted: https://github.com/komuw/ote/pull/58
+
 ## v0.0.10
 - Recognize toolchain keyword in go.mod files: https://github.com/komuw/ote/pull/50
 - Exit with code 0 on success: https://github.com/komuw/ote/pull/51
