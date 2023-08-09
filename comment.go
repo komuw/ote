@@ -55,9 +55,6 @@ const (
 
 // isTest reports whether line has a "// test" comment
 func isTest(line *modfile.Line) bool {
-	if line == nil {
-		return false
-	}
 	if len(line.Suffix) == 0 {
 		return false
 	}
