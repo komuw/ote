@@ -42,6 +42,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	os.Exit(0)
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
@@ -75,7 +76,7 @@ func cli() (string, bool, bool) {
 	var r bool
 
 	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(),
+		_, _ = fmt.Fprintf(flag.CommandLine.Output(),
 			`ote updates a packages go.mod file with a comment next to all dependencies that are test dependencies; identifying them as such.
 
 Usage:
