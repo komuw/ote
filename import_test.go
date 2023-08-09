@@ -16,12 +16,12 @@ func Test_fetchImports(t *testing.T) {
 	}{
 		{
 			name: "nonTestFile",
-			file: "testdata/mod1/main.go",
-			want: []string{"testdata/mod1/api", "testdata/mod1/version"},
+			file: "testdata/modfiles/mod1/main.go",
+			want: []string{"testdata/modfiles/mod1/api", "testdata/modfiles/mod1/version"},
 		},
 		{
 			name: "testFile",
-			file: "testdata/mod1/version/ver_test.go",
+			file: "testdata/modfiles/mod1/version/ver_test.go",
 			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil/mem", "rsc.io/quote"},
 		},
 	}
@@ -50,31 +50,31 @@ func Test_fetchModule(t *testing.T) {
 	}{
 		{
 			name:       "root with ending slash",
-			root:       "testdata/mod1/",
+			root:       "testdata/modfiles/mod1/",
 			importPath: "github.com/hashicorp/nomad/drivers/shared/executor",
 			want:       "github.com/hashicorp/nomad",
 		},
 		{
 			name:       "root with NO ending slash",
-			root:       "testdata/mod1",
+			root:       "testdata/modfiles/mod1",
 			importPath: "github.com/hashicorp/nomad/drivers/shared/executor",
 			want:       "github.com/hashicorp/nomad",
 		},
 		{
 			name:       "short import path",
-			root:       "testdata/mod1/",
+			root:       "testdata/modfiles/mod1/",
 			importPath: "rsc.io/quote",
 			want:       "rsc.io/quote",
 		},
 		{
 			name:       "main module that has nested module inside",
-			root:       "testdata/mod2",
+			root:       "testdata/modfiles/mod2",
 			importPath: "github.com/hashicorp/vault/api",
 			want:       "github.com/hashicorp/vault/api",
 		},
 		{
 			name:       "module that is nested module inside another main",
-			root:       "testdata/mod2/nestedModule1",
+			root:       "testdata/modfiles/mod2/nestedModule1",
 			importPath: "crawshaw.io/sqlite",
 			want:       "crawshaw.io/sqlite",
 		},
@@ -106,23 +106,23 @@ func Test_getAllTestModules(t *testing.T) {
 		{
 			name:               "root with ending slash",
 			testImportPaths:    []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil/mem", "rsc.io/quote"},
-			nonTestImportPaths: []string{"github.com/hashicorp/nomad/drivers/shared/executor", "github.com/pkg/errors", "golang.org/x/sys/windows", "rsc.io/quote", "testdata/mod1/api", "testdata/mod1/version", "github.com/LK4D4/joincontext"},
-			root:               "testdata/mod1/",
+			nonTestImportPaths: []string{"github.com/hashicorp/nomad/drivers/shared/executor", "github.com/pkg/errors", "golang.org/x/sys/windows", "rsc.io/quote", "testdata/modfiles/mod1/api", "testdata/modfiles/mod1/version", "github.com/LK4D4/joincontext"},
+			root:               "testdata/modfiles/mod1/",
 			wantTestModules:    []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 		{
 			name:               "root with NO ending slash",
 			testImportPaths:    []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil/mem", "rsc.io/quote"},
-			nonTestImportPaths: []string{"github.com/hashicorp/nomad/drivers/shared/executor", "github.com/pkg/errors", "golang.org/x/sys/windows", "rsc.io/quote", "testdata/mod1/api", "testdata/mod1/version", "github.com/LK4D4/joincontext"},
-			root:               "testdata/mod1",
+			nonTestImportPaths: []string{"github.com/hashicorp/nomad/drivers/shared/executor", "github.com/pkg/errors", "golang.org/x/sys/windows", "rsc.io/quote", "testdata/modfiles/mod1/api", "testdata/modfiles/mod1/version", "github.com/LK4D4/joincontext"},
+			root:               "testdata/modfiles/mod1",
 			wantTestModules:    []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 
 		{
 			name:               "with duplicates",
 			testImportPaths:    []string{"github.com/frankban/quicktest", "github.com/frankban/quicktest", "github.com/shirou/gopsutil/mem", "github.com/frankban/quicktest"},
-			nonTestImportPaths: []string{"github.com/hashicorp/nomad/drivers/shared/executor", "github.com/pkg/errors", "golang.org/x/sys/windows", "rsc.io/quote", "testdata/mod1/api", "testdata/mod1/version", "github.com/LK4D4/joincontext"},
-			root:               "testdata/mod1",
+			nonTestImportPaths: []string{"github.com/hashicorp/nomad/drivers/shared/executor", "github.com/pkg/errors", "golang.org/x/sys/windows", "rsc.io/quote", "testdata/modfiles/mod1/api", "testdata/modfiles/mod1/version", "github.com/LK4D4/joincontext"},
+			root:               "testdata/modfiles/mod1",
 			wantTestModules:    []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 	}
@@ -150,32 +150,32 @@ func Test_getTestModules(t *testing.T) {
 	}{
 		{
 			name: "root with ending slash",
-			root: "testdata/mod1/",
+			root: "testdata/modfiles/mod1/",
 			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 		{
 			name: "root with NO ending slash",
-			root: "testdata/mod1",
+			root: "testdata/modfiles/mod1",
 			want: []string{"github.com/frankban/quicktest", "github.com/shirou/gopsutil"},
 		},
 		{
 			name: "main module that has nested module inside",
-			root: "testdata/mod2",
+			root: "testdata/modfiles/mod2",
 			want: []string{"github.com/shirou/gopsutil", "gopkg.in/natefinch/lumberjack.v2"},
 		},
 		{
 			name: "module that is nested module inside another main",
-			root: "testdata/mod2/nestedModule1",
+			root: "testdata/modfiles/mod2/nestedModule1",
 			want: []string{"crawshaw.io/sqlite"},
 		},
 		{
 			name: "module that is nested module inside another main take II",
-			root: "testdata/mod2/nestedModule2",
+			root: "testdata/modfiles/mod2/nestedModule2",
 			want: []string{"github.com/sirupsen/logrus"},
 		},
 		{
 			name: "module with vendor directory",
-			root: "testdata/mod3",
+			root: "testdata/modfiles/mod3",
 			want: []string{"go.uber.org/goleak"},
 		},
 	}

@@ -2,6 +2,9 @@ package main
 
 import (
 	"bytes"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	qt "github.com/frankban/quicktest"
@@ -19,11 +22,11 @@ func Test_run(t *testing.T) {
 		want     string
 	}{
 		{
-			name:     "testdata/mod1",
-			fp:       "testdata/mod1",
+			name:     "testdata/modfiles/mod1",
+			fp:       "testdata/modfiles/mod1",
 			readonly: true,
 			wantErr:  "",
-			want: `module testdata/mod1
+			want: `module testdata/modfiles/mod1
 
 go 1.16
 
@@ -57,11 +60,11 @@ retract (
 		},
 
 		{
-			name:     "testdata/mod2",
-			fp:       "testdata/mod2",
+			name:     "testdata/modfiles/mod2",
+			fp:       "testdata/modfiles/mod2",
 			readonly: true,
 			wantErr:  "",
-			want: `module testdata/mod2
+			want: `module testdata/modfiles/mod2
 
 go 1.16
 
@@ -95,11 +98,11 @@ require (
 		},
 
 		{
-			name:     "testdata/mod3",
-			fp:       "testdata/mod3",
+			name:     "testdata/modfiles/mod3",
+			fp:       "testdata/modfiles/mod3",
 			readonly: true,
 			wantErr:  "",
-			want: `module testdata/mod3
+			want: `module testdata/modfiles/mod3
 
 go 1.16
 
@@ -114,11 +117,11 @@ require go.uber.org/goleak v1.1.10 // test
 		},
 
 		{
-			name:     "testdata/mod4",
-			fp:       "testdata/mod4",
+			name:     "testdata/modfiles/mod4",
+			fp:       "testdata/modfiles/mod4",
 			readonly: true,
 			wantErr:  "",
-			want: `module testdata/mod4
+			want: `module testdata/modfiles/mod4
 
 go 1.16
 
@@ -140,11 +143,11 @@ require github.com/benweissmann/memongo v0.1.1 // test
 		},
 
 		{
-			name:     "testdata/mod5",
-			fp:       "testdata/mod5",
+			name:     "testdata/modfiles/mod5",
+			fp:       "testdata/modfiles/mod5",
 			readonly: true,
 			wantErr:  "",
-			want: `module testdata/mod5
+			want: `module testdata/modfiles/mod5
 
 go 1.16
 
@@ -162,11 +165,11 @@ require (
 		},
 
 		{
-			name:     "testdata/mod6",
-			fp:       "testdata/mod6",
+			name:     "testdata/modfiles/mod6",
+			fp:       "testdata/modfiles/mod6",
 			readonly: true,
 			wantErr:  "",
-			want: `module testdata/mod6
+			want: `module testdata/modfiles/mod6
 
 go 1.16
 
@@ -186,11 +189,11 @@ require (
 		},
 
 		{
-			name:     "testdata/mod7",
-			fp:       "testdata/mod7",
+			name:     "testdata/modfiles/mod7",
+			fp:       "testdata/modfiles/mod7",
 			readonly: true,
 			wantErr:  "",
-			want: `module testdata/mod7
+			want: `module testdata/modfiles/mod7
 
 go 1.16
 
@@ -207,8 +210,8 @@ require rsc.io/qr v0.2.0 // test
 		},
 
 		{
-			name:     "testdata/nonExistentPackage",
-			fp:       "testdata/nonExistentPackage",
+			name:     "testdata/modfiles/nonExistentPackage",
+			fp:       "testdata/modfiles/nonExistentPackage",
 			readonly: true,
 			wantErr:  "no such file or directory",
 			want:     ``,
@@ -229,7 +232,9 @@ require rsc.io/qr v0.2.0 // test
 			}
 
 			got := w.String()
-			attest.Equal(t, got, tt.want)
+			// attest.Equal(t, got, tt.want)
+			path := getDataPath(t, "ote_test.go", tt.name)
+			dealWithTestData(t, path, got)
 		})
 	}
 }
@@ -263,4 +268,45 @@ func Test_cli(t *testing.T) {
 			c.Assert(v, qt.Equals, tt.version)
 		})
 	}
+}
+
+const oteWriteDataForTests = "OTE_WRITE_DATA_FOR_TESTS"
+
+// dealWithTestData asserts that gotContent is equal to data found at path.
+//
+// If the environment variable [oteWriteDataForTests] is set, this func
+// will write gotContent to path instead.
+func dealWithTestData(t *testing.T, path, gotContent string) {
+	t.Helper()
+
+	path = strings.ReplaceAll(path, ".go", "")
+
+	p, e := filepath.Abs(path)
+	attest.Ok(t, e)
+
+	writeData := os.Getenv(oteWriteDataForTests) != ""
+	if writeData {
+		attest.Ok(t,
+			os.WriteFile(path, []byte(gotContent), 0o644),
+		)
+		t.Logf("\n\t written testdata to %s\n", path)
+		return
+	}
+
+	b, e := os.ReadFile(p)
+	attest.Ok(t, e)
+
+	expectedContent := string(b)
+	attest.Equal(t, gotContent, expectedContent, attest.Sprintf("path: %s", path))
+}
+
+func getDataPath(t *testing.T, testPath, testName string) string { //nolint:unparam
+	t.Helper()
+
+	s := strings.ReplaceAll(testName, " ", "_")
+	tName := strings.ReplaceAll(s, "/", "_")
+
+	path := filepath.Join("testdata", "text_files", testPath, tName) + ".txt"
+
+	return path
 }

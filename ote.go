@@ -25,11 +25,11 @@ import (
 // Usage:
 //
 //	1.
-//	 go run . -f testdata/mod1/ -r
+//	 go run . -f testdata/modfiles/mod1/ -r
 //
 //	2.
 //	 export export GOPACKAGESDEBUG=true && \
-//	 go run . -f testdata/mod1/ -r
+//	 go run . -f testdata/modfiles/mod1/ -r
 func main() {
 	f, r, v := cli()
 	if v {

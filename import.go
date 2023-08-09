@@ -79,7 +79,7 @@ func fetchImports(file string) ([]string, error) {
 
 // Usage:
 //
-//	fetchModule("testdata/mod1/", "github.com/hashicorp/nomad/drivers/shared/executor")
+//	fetchModule("testdata/modfiles/mod1/", "github.com/hashicorp/nomad/drivers/shared/executor")
 func fetchModule(root, importPath string) (string, error) {
 	cfg := &packages.Config{
 		Mode:  packages.NeedModule,
@@ -113,7 +113,7 @@ func fetchModule(root, importPath string) (string, error) {
 				// However, we do not know in advance what the required build tags are. That's why the call
 				// to `packages.Load()/packages.Config` do not have any build tag specified.
 				//
-				// As an example, `/testdata/mod1/` depends on `golang.org/x/sys/windows`. That dependency
+				// As an example, `/testdata/modfiles/mod1/` depends on `golang.org/x/sys/windows`. That dependency
 				// has the build tag; `+build windows`: https://github.com/golang/sys/blob/0f9fa26af87c481a6877a4ca1330699ba9a30673/windows/aliases.go#L5-L8
 				// and thus `packages.Load()` fails with error;
 				// `build constraints exclude all Go files in /pkg/mod/golang.org/x/sys@v0.0.1/windows`
