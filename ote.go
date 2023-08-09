@@ -42,6 +42,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	os.Exit(0)
 }
 
 func run(fp string, w io.Writer, readonly bool) error {
