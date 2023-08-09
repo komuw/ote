@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	qt "github.com/frankban/quicktest"
+	"go.akshayshah.org/attest"
 )
 
 func Test_run(t *testing.T) {
@@ -218,18 +219,17 @@ require rsc.io/qr v0.2.0 // test
 
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			c := qt.New(t)
 
 			w := &bytes.Buffer{}
 			err := run(tt.fp, w, tt.readonly)
 			if len(tt.wantErr) > 0 {
-				c.Assert(err.Error(), qt.Contains, tt.wantErr)
+				attest.Subsequence(t, err.Error(), tt.wantErr)
 			} else {
-				c.Assert(err, qt.IsNil)
+				attest.Ok(t, err)
 			}
 
 			got := w.String()
-			c.Assert(got, qt.Equals, tt.want)
+			attest.Equal(t, got, tt.want)
 		})
 	}
 }
