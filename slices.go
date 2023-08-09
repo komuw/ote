@@ -1,12 +1,12 @@
 package main
 
-func dedupe(in []string) []string {
+func dedupe[T comparable](in []T) []T {
 	if len(in) <= 1 {
 		return in
 	}
 
-	seen := make(map[string]struct{}, len(in))
-	out := make([]string, len(in))
+	seen := make(map[T]struct{}, len(in))
+	out := make([]T, len(in))
 	_ = copy(out, in)
 	j := 0
 	for _, v := range out {
@@ -21,26 +21,16 @@ func dedupe(in []string) []string {
 }
 
 // difference returns the elements in `a` that aren't in `b`.
-func difference(a, b []string) []string {
-	mb := make(map[string]struct{}, len(b))
+func difference[T comparable](a, b []T) []T {
+	mb := make(map[T]struct{}, len(b))
 	for _, x := range b {
 		mb[x] = struct{}{}
 	}
-	diff := []string{}
+	diff := []T{}
 	for _, x := range a {
 		if _, found := mb[x]; !found {
 			diff = append(diff, x)
 		}
 	}
 	return diff
-}
-
-// contains tells whether a contains x.
-func contains(a []string, x string) bool {
-	for _, n := range a {
-		if x == n {
-			return true
-		}
-	}
-	return false
 }

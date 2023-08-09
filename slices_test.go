@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"testing"
 
 	qt "github.com/frankban/quicktest"
@@ -133,7 +134,7 @@ func Test_contains(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			c := qt.New(t)
-			got := contains(tt.a, tt.x)
+			got := slices.Contains(tt.a, tt.x)
 			c.Assert(got, qt.Equals, tt.want)
 		})
 	}

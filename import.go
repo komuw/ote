@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"io/fs"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 
@@ -164,7 +165,7 @@ func getAllTestModules(testImportPaths, nonTestImportPaths []string, root string
 
 	existsInBoth := []string{}
 	for _, a := range nonTestMods {
-		if contains(testOnlyMods, a) {
+		if slices.Contains(testOnlyMods, a) {
 			existsInBoth = append(existsInBoth, a)
 		}
 	}
