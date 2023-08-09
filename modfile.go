@@ -32,7 +32,8 @@ func getModFile(gomodFile string) (*modfile.File, error) {
 
 // updateMod updates the in-memory modfile
 func updateMod(trueTestModules []string, f *modfile.File) error {
-	{ // 1. update for indirect modules.
+	{ // 1. update for direct & indirect modules.
+		directLines := []*modfile.Line{}
 		indirectLines := []*modfile.Line{}
 		for _, fr := range f.Require {
 			if fr.Indirect {
@@ -43,16 +44,34 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 				if err := f.DropRequire(fr.Mod.Path); err != nil {
 					return err
 				}
+			} else if !slices.Contains(trueTestModules, fr.Mod.Path) {
+				// This is a direct dependency that is also not a test dependency.
+				directLines = append(directLines, &modfile.Line{
+					Token:    []string{fr.Mod.Path, fr.Mod.Version},
+					Comments: fr.Syntax.Comments,
+				})
+				if err := f.DropRequire(fr.Mod.Path); err != nil {
+					return err
+				}
 			}
 		}
 
+		if len(directLines) > 0 {
+			block := &modfile.LineBlock{
+				Token: []string{"require"},
+				Line:  directLines,
+			}
+			index := findLastRequire(f) + 1
+			f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, block)
+		}
+
 		if len(indirectLines) > 0 {
-			tBlock := &modfile.LineBlock{
+			block := &modfile.LineBlock{
 				Token: []string{"require"},
 				Line:  indirectLines,
 			}
 			index := findLastRequire(f) + 1
-			f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, tBlock)
+			f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, block)
 		}
 	}
 
