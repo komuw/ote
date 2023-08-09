@@ -57,9 +57,9 @@ func run(fp string, w io.Writer, readonly bool) error {
 	if errT != nil {
 		return errT
 	}
-	errU := updateMod(trueTestModules, f)
-	if errU != nil {
-		return errU
+
+	if err := updateMod(trueTestModules, f); err != nil {
+		return err
 	}
 
 	if err := writeMod(f, gomodFile, w, readonly); err != nil {
