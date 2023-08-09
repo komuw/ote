@@ -37,6 +37,7 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		indirectLines := []*modfile.Line{}
 		for _, fr := range f.Require {
 			if fr.Indirect {
+				setTest(fr.Syntax, false) // remove any test comments that there may be there.
 				indirectLines = append(indirectLines, &modfile.Line{
 					Token:    []string{fr.Mod.Path, fr.Mod.Version},
 					Comments: fr.Syntax.Comments,
@@ -44,8 +45,10 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 				if err := f.DropRequire(fr.Mod.Path); err != nil {
 					return err
 				}
-			} else if !slices.Contains(trueTestModules, fr.Mod.Path) && !isTest(fr.Syntax) {
+			} else if !slices.Contains(trueTestModules, fr.Mod.Path) {
 				// This is a direct dependency that is also not a test dependency.
+
+				setTest(fr.Syntax, false) // remove any test comments that there may be there.
 				directLines = append(directLines, &modfile.Line{
 					Token:    []string{fr.Mod.Path, fr.Mod.Version},
 					Comments: fr.Syntax.Comments,
