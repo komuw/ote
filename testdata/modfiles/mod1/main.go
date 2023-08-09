@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"testdata/mod1/api"
-	"testdata/mod1/version"
+	"testdata/modfiles/mod1/api"
+	"testdata/modfiles/mod1/version"
 )
 
 /*
@@ -16,10 +16,10 @@ func main() {
 	fmt.Println("mod1")
 
 	v := version.Ver()
-	fmt.Println("testdata/mod1/version.Ver: ", v)
+	fmt.Println("testdata/modfiles/mod1/version.Ver: ", v)
 
 	apiMsg, err := api.Api()
-	fmt.Printf("testdata/mod1/api.apiMsg: %v, testdata/mod1/api.error: %v", apiMsg, err)
+	fmt.Printf("testdata/modfiles/mod1/api.apiMsg: %v, testdata/modfiles/mod1/api.error: %v", apiMsg, err)
 
 	_ = C.uint(45)
 }

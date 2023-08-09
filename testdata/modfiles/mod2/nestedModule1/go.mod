@@ -1,4 +1,4 @@
-module testdata/mod2/nestedModule1
+module testdata/modfiles/mod2/nestedModule1
 
 go 1.16
 
