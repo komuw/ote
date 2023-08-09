@@ -7,6 +7,7 @@ Most recent version is listed first.
 - Recognize toolchain keyword in go.mod files: https://github.com/komuw/ote/pull/50
 - Exit with code 0 on success: https://github.com/komuw/ote/pull/51
 - Format indirect dependencies into their own block: https://github.com/komuw/ote/pull/53
+- Use generic slice functions: https://github.com/komuw/ote/pull/56
 
 ## v0.0.9
 - Update to Go v1.20: https://github.com/komuw/ote/pull/47
