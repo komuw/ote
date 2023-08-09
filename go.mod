@@ -15,4 +15,7 @@ require (
 	golang.org/x/sys v0.11.0 // indirect
 )
 
-require github.com/frankban/quicktest v1.14.6 // test
+require (
+	github.com/frankban/quicktest v1.14.6 // test
+	go.akshayshah.org/attest v1.0.2 // test
+)

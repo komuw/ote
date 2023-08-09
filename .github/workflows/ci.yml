@@ -181,7 +181,7 @@ jobs:
           wget -nc --output-document=/tmp/semgrep-go.zip https://github.com/dgryski/semgrep-go/archive/refs/heads/master.zip
           unzip -o /tmp/semgrep-go.zip -d /tmp/semgrep-go
           go get github.com/quasilyte/go-ruleguard/dsl
-          golangci-lint run --config .golangci.yml ./...
+          # golangci-lint run --config .golangci.yml ./... # does not seem to work with Go1.21
           go mod tidy
           python -m venv /tmp/.venv
           . /tmp/.venv/bin/activate

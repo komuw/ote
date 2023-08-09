@@ -1,4 +1,4 @@
-module testdata/mod3
+module testdata/modfiles/mod3
 
 go 1.16
 
