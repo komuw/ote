@@ -40,7 +40,9 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 					Token:    []string{fr.Mod.Path, fr.Mod.Version},
 					Comments: fr.Syntax.Comments,
 				})
-				f.DropRequire(fr.Mod.Path)
+				if err := f.DropRequire(fr.Mod.Path); err != nil {
+					return err
+				}
 			}
 		}
 
@@ -96,13 +98,15 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 			}
 		}
 
-		addTestRequireBlock(f, lineMods)
+		if err := addTestRequireBlock(f, lineMods); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
+func addTestRequireBlock(f *modfile.File, lineMods []lineMod) error {
 	// Add a new require block after the last "require".
 	// This new block will house test-only requirements
 	// eg.
@@ -113,12 +117,14 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 			)
 	*/
 	if len(lineMods) <= 0 {
-		return
+		return nil
 	}
 	for _, y := range lineMods {
 		// since test-only deps are in their own require blocks,
 		// drop them from the main one.
-		_ = f.DropRequire(y.name)
+		if err := f.DropRequire(y.name); err != nil {
+			return err
+		}
 	}
 
 	testLines := []*modfile.Line{}
@@ -135,6 +141,8 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) {
 	index := findLastRequire(f) + 1
 	f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, newTestBlock)
 	f.Syntax.Cleanup()
+
+	return nil
 }
 
 func findLastRequire(f *modfile.File) int {
