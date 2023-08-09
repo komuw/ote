@@ -16,11 +16,12 @@ import (
 const stdlib = "std"
 
 // once is used to ensure that the stdLibPkgs map is populated only once
-var once = &sync.Once{}
-
-var stdLibPkgs = map[string]struct{}{
-	"C": {}, // cGo. see: https://blog.golang.org/cgo
-}
+var (
+	once       = &sync.Once{}         //nolint:gochecknoglobals
+	stdLibPkgs = map[string]struct{}{ //nolint:gochecknoglobals
+		"C": {}, // cGo. see: https://blog.golang.org/cgo
+	}
+)
 
 func isStdLibPkg(pkg, std string) (bool, error) {
 	var err error
