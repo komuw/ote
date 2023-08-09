@@ -201,7 +201,9 @@ func writeMod(f *modfile.File, gomodFile string, w io.Writer, readonly bool) err
 		if errO != nil {
 			return errO
 		}
-		defer fi.Close()
+		defer func() {
+			_ = fi.Close()
+		}()
 
 		_, errW := fi.Write(b)
 		if errW != nil {
