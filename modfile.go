@@ -35,7 +35,6 @@ func updateMod(trueTestModules []string, f *modfile.File) error {
 		indirectLines := []*modfile.Line{}
 		for _, fr := range f.Require {
 			if fr.Indirect {
-				// fmt.Println("\n\t fr: ", fr.Syntax)
 				indirectLines = append(indirectLines, &modfile.Line{
 					Token:    []string{fr.Mod.Path, fr.Mod.Version},
 					Comments: fr.Syntax.Comments,
