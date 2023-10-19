@@ -149,7 +149,9 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) error {
 		}
 	}
 
-	testLines := []*modfile.Line{}
+	testLines := []*modfile.Line{
+		{Token: []string{"// created using: https://github.com/komuw/ote \n"}},
+	}
 	for _, y := range lineMods {
 		testLines = append(testLines, &modfile.Line{
 			Token:    []string{y.name, y.ver},

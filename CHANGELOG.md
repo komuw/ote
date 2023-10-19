@@ -3,6 +3,9 @@
 Most recent version is listed first.  
 
 
+## v0.0.12
+- add a tag-line of the tool(`ote`) that identified the test dependencies: https://github.com/komuw/ote/pull/40
+
 ## v0.0.11
 - Bugfix;direct dependencies in a require block with indirect deps should be well formatted: https://github.com/komuw/ote/pull/58
 
