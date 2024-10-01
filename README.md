@@ -32,13 +32,13 @@ ote --help
 ```bash
 examples:
 
-    ote .                   # update go.mod in the current directory
+  ote .                   # update go.mod in the current directory
         
-    ote -f /tmp/someDir     # update go.mod in the /tmp/someDir directory
+  ote -f /tmp/someDir     # update go.mod in the /tmp/someDir directory
 
-    ote -r                  # write to stdout instead of updating the go.mod in the current directory
+  ote -r                  # write to stdout instead of updating the go.mod in the current directory
 
-    ote -f /tmp/someDir -r  # write to stdout instead of updating go.mod file in the /tmp/someDir directory.  
+  ote -f /tmp/someDir -r  # write to stdout instead of updating go.mod file in the /tmp/someDir directory
 ```
 
 If your application has a `go.mod` file like the following;
