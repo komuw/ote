@@ -36,7 +36,7 @@ examples:
         
   ote -f /someDir     # update go.mod in the /someDir directory
 
-  ote -r              # write to stdout instead of updating the go.mod in the current directory
+  ote -r              # write to stdout instead of updating go.mod in the current directory
 
   ote -f /someDir -r  # write to stdout instead of updating go.mod file in the /someDir directory
 ```
