@@ -38,7 +38,7 @@ examples:
 
   ote -r              # write to stdout instead of updating go.mod in the current directory
 
-  ote -f /someDir -r  # write to stdout instead of updating go.mod file in the /someDir directory
+  ote -f /someDir -r  # write to stdout instead of updating go.mod in the /someDir directory
 ```
 
 If your application has a `go.mod` file like the following;
