@@ -18,14 +18,6 @@ require (
 require (
 	// This is managed by https://github.com/komuw/ote
 
-	// This is managed by https://github.com/komuw/ote
-
-	// This is managed by https://github.com/komuw/ote
-
-	// This is managed by https://github.com/komuw/ote
-
-	// This is managed by https://github.com/komuw/ote
-
 	github.com/frankban/quicktest v1.14.6 // test
 	go.akshayshah.org/attest v1.1.0 // test
 )
