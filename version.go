@@ -1,5 +1,5 @@
 package main
 
 func version() string {
-	return `ote v0.0.11`
+	return `ote v0.0.12`
 }
