@@ -20,6 +20,8 @@ require (
 )
 
 require (
+	// This is managed by https://github.com/komuw/ote
+
 	github.com/frankban/quicktest v1.12.1 // test
 	github.com/shirou/gopsutil v2.20.9+incompatible // test; PriorComment
 )

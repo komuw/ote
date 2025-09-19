@@ -8,6 +8,8 @@ require (
 )
 
 require (
+	// This is managed by https://github.com/komuw/ote
+
 	github.com/sirupsen/logrus v1.8.1 // test
 	github.com/spf13/jwalterweatherman v1.0.0 // test
 )

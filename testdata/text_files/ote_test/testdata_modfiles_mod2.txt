@@ -27,6 +27,8 @@ require (
 )
 
 require (
+	// This is managed by https://github.com/komuw/ote
+
 	github.com/shirou/gopsutil v3.21.4+incompatible // test
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // test
 )

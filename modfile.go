@@ -159,12 +159,50 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) error {
 			},
 		)
 	}
+
 	newTestBlock := &modfile.LineBlock{
 		Token: []string{"require"},
 		Line:  testLines,
 	}
 	index := findLastRequire(f) + 1
 	f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, newTestBlock)
+
+	{ // Only add managed comment if it does not exist.
+		const managedComment = "// This is managed by https://github.com/komuw/ote"
+		hasComment := false
+
+		for _, stmt := range f.Syntax.Stmt {
+			if block, ok := stmt.(*modfile.LineBlock); ok && len(block.Token) > 0 && block.Token[0] == "require" {
+				for _, line := range block.Line {
+					for _, comment := range line.Comments.Before {
+						if comment.Token == managedComment {
+							hasComment = true
+							break
+						}
+					}
+					if hasComment {
+						break
+					}
+				}
+			}
+			if hasComment {
+				break
+			}
+		}
+
+		if !hasComment {
+			commentLine := &modfile.Line{
+				Token: []string{},
+				Comments: modfile.Comments{
+					Before: []modfile.Comment{
+						{Token: managedComment, Suffix: false},
+					},
+				},
+			}
+			// Insert the comment at the beginning of the block
+			newTestBlock.Line = append([]*modfile.Line{commentLine}, newTestBlock.Line...)
+		}
+	}
 
 	return nil
 }
