@@ -7,5 +7,9 @@ require (
 	github.com/kingzbauer/africastalking-go v0.0.2-alpha.1
 )
 
-require go.uber.org/goleak v1.1.10 // test
+require (
+	// This is managed by https://github.com/komuw/ote
+
+	go.uber.org/goleak v1.1.10 // test
+)
 

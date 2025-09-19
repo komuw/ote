@@ -13,6 +13,8 @@ require (
 )
 
 require (
+	// This is managed by https://github.com/komuw/ote
+
 	github.com/shirou/gopsutil v3.21.5+incompatible // test
 	rsc.io/quote v1.5.2 // test
 )

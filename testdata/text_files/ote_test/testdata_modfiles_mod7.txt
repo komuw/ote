@@ -9,5 +9,9 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 )
 
-require rsc.io/qr v0.2.0 // test
+require (
+	// This is managed by https://github.com/komuw/ote
+
+	rsc.io/qr v0.2.0 // test
+)
 

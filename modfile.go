@@ -159,12 +159,26 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) error {
 			},
 		)
 	}
+
 	newTestBlock := &modfile.LineBlock{
 		Token: []string{"require"},
 		Line:  testLines,
 	}
 	index := findLastRequire(f) + 1
 	f.Syntax.Stmt = insertAt(f.Syntax.Stmt, index, newTestBlock)
+
+	// Add the comment as the first line inside the require block
+	commentLine := &modfile.Line{
+		Token: []string{},
+		Comments: modfile.Comments{
+			Before: []modfile.Comment{
+				{Token: "// This is managed by https://github.com/komuw/ote", Suffix: false},
+			},
+		},
+	}
+
+	// Insert the comment at the beginning of the block
+	newTestBlock.Line = append([]*modfile.Line{commentLine}, newTestBlock.Line...)
 
 	return nil
 }
