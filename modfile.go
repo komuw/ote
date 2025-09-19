@@ -151,10 +151,13 @@ func addTestRequireBlock(f *modfile.File, lineMods []lineMod) error {
 
 	testLines := []*modfile.Line{}
 	for _, y := range lineMods {
-		testLines = append(testLines, &modfile.Line{
-			Token:    []string{y.name, y.ver},
-			Comments: y.coms,
-		})
+		testLines = append(
+			testLines,
+			&modfile.Line{
+				Token:    []string{y.name, y.ver},
+				Comments: y.coms,
+			},
+		)
 	}
 	newTestBlock := &modfile.LineBlock{
 		Token: []string{"require"},
